@@ -11,9 +11,9 @@ using System.Linq;
 public class AnimationSimulatorWindow : EditorWindow
 {
     public List<Animator> _animators;
-    Vector2 scrollPos;
+    Vector2 scrollPos = Vector2.zero;
     string t = "This is a string inside a Scroll view!";
-
+    static AnimationSimulatorWindow window;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +29,7 @@ public class AnimationSimulatorWindow : EditorWindow
     [MenuItem("Examples/Modify internal Quaternion")]
     static void Init()
     {
-        AnimationSimulatorWindow window = (AnimationSimulatorWindow)EditorWindow.GetWindow(typeof(AnimationSimulatorWindow), true, "My Empty Window");
+        window = (AnimationSimulatorWindow) GetWindowWithRect(typeof(AnimationSimulatorWindow), new Rect(200, 200, 100, 150));
         window.Show();
     }
 
@@ -43,7 +43,9 @@ public class AnimationSimulatorWindow : EditorWindow
     public static void ShowWindow()
     {
         //Show existing window instance. If one doesn't exist, make one.
-        GetWindow(typeof(AnimationSimulatorWindow));
+        /*GetWindow(typeof(AnimationSimulatorWindow));*/
+        window = (AnimationSimulatorWindow)GetWindowWithRect(typeof(AnimationSimulatorWindow), new Rect(0, 0, 300, 300));
+        window.Show();
     }
 
     void OnGUI()
@@ -51,18 +53,18 @@ public class AnimationSimulatorWindow : EditorWindow
         // Find all animators in the scene
         _animators = FindObjectsOfType<Animator>().ToList();
 
-        foreach (var a in _animators)
-            Debug.Log(a.gameObject.name);
+        /*foreach (var a in _animators)
+            Debug.Log(a.gameObject.name);*/
 
         EditorGUILayout.BeginVertical();
-
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(500), GUILayout.Height(500));
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, false);
 
         GUILayout.Label("Base Settings", EditorStyles.boldLabel);
         myString = EditorGUILayout.TextField("Text Field", myString);
         GUILayout.Label("Animators", EditorStyles.boldLabel);
         myString = EditorGUILayout.TextField(_animators.Count.ToString(), _animators.Count.ToString());
 
+        /*EditorGUILayout.BeginVertical();*/
         // List all animators in the scene
         foreach (var a in _animators)
         {
@@ -71,29 +73,25 @@ public class AnimationSimulatorWindow : EditorWindow
                 Selection.activeGameObject = a.gameObject;
             }
 
-           /* foreach (var animation in animator.runtimeAnimatorController.animationClips)
-            {
-                GUILayout.Label(animation.name, EditorStyles.boldLabel);
-            }
-            GUILayout.Label(" ", EditorStyles.boldLabel);*/
+            /* foreach (var animation in animator.runtimeAnimatorController.animationClips)
+             {
+                 GUILayout.Label(animation.name, EditorStyles.boldLabel);
+             }
+             GUILayout.Label(" ", EditorStyles.boldLabel);*/
         }
 
-        if (Selection.activeGameObject.TryGetComponent(out Animator animator))
+        if (Selection.activeGameObject)
         {
-            foreach (var animation in animator.runtimeAnimatorController.animationClips)
+            if (Selection.activeGameObject.TryGetComponent(out Animator animator))
             {
-                GUILayout.Label(animation.name, EditorStyles.boldLabel);
+                foreach (var animation in animator.runtimeAnimatorController.animationClips)
+                {
+                    GUILayout.Label(animation.name, EditorStyles.boldLabel);
+                }
             }
         }
-
-        EditorGUILayout.EndVertical();
 
         EditorGUILayout.EndScrollView();
-
-        /* groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
-         myBool = EditorGUILayout.Toggle("Toggle", myBool);
-         myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
-         EditorGUILayout.EndToggleGroup();*/
-    
+        EditorGUILayout.EndVertical();
     }
 }
