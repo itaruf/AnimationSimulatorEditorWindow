@@ -18,6 +18,7 @@ public class AnimationSimulatorWindow : EditorWindow
     // Animation Data
     public Animator[] _animators;
     public Animator _animator;
+    public Dictionary<int, Animator> pairs = new Dictionary<int, Animator>();
     public AnimationClip _animationClip;
     static bool isPlaying = false;
     static double endTime;
@@ -65,14 +66,27 @@ public class AnimationSimulatorWindow : EditorWindow
         GUILayout.Label($"Animators : {_animators.Length}", EditorStyles.boldLabel);
 
         if (Selection.activeGameObject)
+        {
             if (!Selection.activeGameObject.TryGetComponent(out _animator))
-                isAnimatorSelected = false;
+            {
+                ResetData();
+            }
             else
             {
                 isAnimatorSelected = true;
-                animatorLabel = _animator.gameObject.name;
+                animatorLabel = _animator.gameObject.name + " " + _animator.gameObject.GetInstanceID().ToString();
+                Selection.activeGameObject = _animator.gameObject;
             }
+        }
 
+        else
+        {
+            isPlaying = false;
+            isAnimatorSelected = false;
+            showAnimClipsDropDown = false;
+            animClipLabel = "Select an animation clip";
+            animatorLabel = "Select an animator";
+        }
 
         // List all animators in the scene
         ListAnimators();
@@ -82,8 +96,21 @@ public class AnimationSimulatorWindow : EditorWindow
         if (isAnimatorSelected)
             ListAnimationClips();
 
+        /*Debug.Log(animatorLabel);*/
+
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
+    }
+
+    private static void ResetData()
+    {
+        isPlaying = false;
+        isAnimatorSelected = false;
+        showAnimatorsDropDown = false;
+        showAnimClipsDropDown = false;
+
+        animClipLabel = "Select an animation clip";
+        animatorLabel = "Select an animator";
     }
 
     void ListAnimators()
