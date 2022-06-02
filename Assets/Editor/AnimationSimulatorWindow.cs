@@ -7,10 +7,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using System.Linq;
 using System;
+using UnityEditor.SceneManagement;
 
 #if UNITY_EDITOR
 [ExecuteInEditMode]
-[CustomEditor(typeof(IdleChanger))]
 public class AnimationSimulatorWindow : EditorWindow
 {
     static AnimationSimulatorWindow window;
@@ -19,12 +19,22 @@ public class AnimationSimulatorWindow : EditorWindow
     public Animator[] _animators;
     public Animator _animator;
     public AnimationClip _animationClip;
-    bool isPlaying = false;
-    double endTime;
+    static bool isPlaying = false;
+    static double endTime;
 
     // Scrollbar
     Vector2 scrollPos = Vector2.zero;
 
+    // DropDowns
+    static bool showAnimClipsDropDown = false;
+    static string animClipLabel = "Select an animation clip";
+    public Rect animClipsRect = new Rect(100, 100, 200, 200);
+
+    static bool showAnimatorsDropDown = false;
+    static string animatorLabel = "Select an animator";
+    public Rect animatorsRect = new Rect(100, 100, 200, 200);
+
+    static bool isAnimatorSelected = false;
 
     // Subscribing to events
     static AnimationSimulatorWindow()
@@ -37,6 +47,8 @@ public class AnimationSimulatorWindow : EditorWindow
     public static void ShowWindow()
     {
         UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += SceneClosing;
+        UnityEditor.SceneManagement.EditorSceneManager.sceneOpening += SceneOpening;
+        UnityEditor.SceneManagement.EditorSceneManager.sceneOpened += SceneOpened;
 
         window = (AnimationSimulatorWindow)GetWindowWithRect(typeof(AnimationSimulatorWindow), new Rect(0, 0, 300, 300));
         window.Show();
@@ -52,11 +64,23 @@ public class AnimationSimulatorWindow : EditorWindow
 
         GUILayout.Label($"Animators : {_animators.Length}", EditorStyles.boldLabel);
 
+        if (Selection.activeGameObject)
+            if (!Selection.activeGameObject.TryGetComponent(out _animator))
+                isAnimatorSelected = false;
+            else
+            {
+                isAnimatorSelected = true;
+                animatorLabel = _animator.gameObject.name;
+            }
+
+
         // List all animators in the scene
         ListAnimators();
 
         // List all animations of the selected animator
-        ListAnimationClips();
+
+        if (isAnimatorSelected)
+            ListAnimationClips();
 
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
@@ -64,40 +88,115 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void ListAnimators()
     {
-        foreach (var a in _animators)
+        if (EditorGUILayout.DropdownButton(new GUIContent(animatorLabel), FocusType.Passive))
         {
-            if (GUILayout.Button(a.name))
-                Selection.activeGameObject = a.gameObject;
+            if (showAnimatorsDropDown)
+                showAnimatorsDropDown = false;
+            else
+                showAnimatorsDropDown = true;
         }
+
+        if (!showAnimatorsDropDown)
+            return;
+
+        // Draw Dropdown
+        BeginWindows();
+        animatorsRect = GUILayout.Window(123, animatorsRect, AnimatorsDropDown, "");
+
+        if (Event.current.type == EventType.MouseDown)
+        {
+            if (animatorsRect.Contains(Event.current.mousePosition) == false)
+            {
+                showAnimatorsDropDown = false;
+            }
+        }
+        EndWindows();
     }
 
     void ListAnimationClips()
     {
-        if (Selection.activeGameObject)
+        if (!isAnimatorSelected)
         {
-            if (Selection.activeGameObject.TryGetComponent(out _animator))
+            showAnimClipsDropDown = false;
+            EndWindows();
+            return;
+
+        }
+        if (EditorGUILayout.DropdownButton(new GUIContent(animClipLabel), FocusType.Passive))
+        {
+            if (showAnimClipsDropDown)
+                showAnimClipsDropDown = false;
+            else
+            showAnimClipsDropDown = true;
+        }
+
+        if (!showAnimClipsDropDown)
+            return;
+
+        // Draw Dropdown
+        BeginWindows();
+        animClipsRect = GUILayout.Window(123, animClipsRect, AnimClipsDropDown, "");
+
+        if (Event.current.type == EventType.MouseDown)
+        {
+            if (animClipsRect.Contains(Event.current.mousePosition) == false)
             {
-                AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
-                foreach (var a in clips)
+                showAnimClipsDropDown = false;
+            }
+        }
+        EndWindows();
+
+        /* if (GUILayout.Button("STOP"))
+         {
+             EditorApplication.update -= PlayAnimationClip;
+             isPlaying = false;
+         }*/
+    }
+
+    void AnimatorsDropDown(int unusedWindowID)
+    {
+        foreach (var a in _animators)
+        {
+            if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
+            {
+                animatorLabel = a.name;
+                showAnimatorsDropDown = false;
+                Selection.activeObject = a.gameObject;
+                isAnimatorSelected = true;
+            }
+        }
+        GUI.DragWindow();
+    }
+
+    void AnimClipsDropDown(int unusedWindowID)
+    {
+        if (!Selection.activeGameObject)
+            return;
+
+        if (Selection.activeGameObject.TryGetComponent(out _animator))
+        {
+            if (!_animator)
+                return;
+
+            AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
+            foreach (var a in clips)
+            {
+                if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
                 {
-                    if (GUILayout.Button(a.name))
-                    {
-                        endTime = EditorApplication.timeSinceStartup;
+                    animClipLabel = a.name;
+                    showAnimClipsDropDown = false;
+                    Selection.activeObject = _animator.gameObject;
 
-                        _animationClip = a;
+                    endTime = EditorApplication.timeSinceStartup;
 
-                        EditorApplication.update += PlayAnimationClip;
-                        isPlaying = true;
-                        PlayAnimationClip();
-                    }
+                    _animationClip = a;
 
-                    if (GUILayout.Button("STOP"))
-                    {
-                        EditorApplication.update -= PlayAnimationClip;
-                        isPlaying = false;
-                    }
+                    EditorApplication.update += PlayAnimationClip;
+                    isPlaying = true;
+                    PlayAnimationClip();
                 }
             }
+            GUI.DragWindow();
         }
     }
 
@@ -109,12 +208,9 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!isPlaying)
             return;
 
-        Debug.Log(_animationClip.name);
-        Debug.Log(_animator.gameObject.name);
-
         double timeElapsed = EditorApplication.timeSinceStartup - endTime;
 
-        _animationClip.SampleAnimation(_animator.gameObject, (float) timeElapsed);
+        _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
     }
 
     static Animator[] GetAnimatorsInScene()
@@ -134,24 +230,39 @@ public class AnimationSimulatorWindow : EditorWindow
         return AnimatorList.ToArray();
     }
 
-    void OnSceneClosing()
+    static void OnSceneClosing()
     {
         isPlaying = false;
-        EditorApplication.update -= PlayAnimationClip;
+        isAnimatorSelected = false;
+        showAnimatorsDropDown = false;
+        showAnimClipsDropDown = false;
+
+        animClipLabel = "Select an animation clip";
+        animatorLabel = "Select an animator";
+
+        Selection.activeGameObject = null;
+        /*EditorApplication.update -= PlayAnimationClip;*/
     }
 
+    static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
+    {
+        Debug.Log("SceneOpened");
+    }
+    static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
+    {
+        Debug.Log("SceneOpening");
+    }
     static void SceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingScene)
     {
         Debug.Log("SceneClosing");
-        AnimationSimulatorWindow animationSimulator = new AnimationSimulatorWindow();
-        animationSimulator.OnSceneClosing();
+        OnSceneClosing();
     }
 
-   static void LogPlayModeState(PlayModeStateChange state)
+    static void LogPlayModeState(PlayModeStateChange state)
     {
         Debug.Log(state);
-        AnimationSimulatorWindow animationSimulator = new AnimationSimulatorWindow();
-        animationSimulator.OnSceneClosing();
+
+        OnSceneClosing();
     }
 }
 
