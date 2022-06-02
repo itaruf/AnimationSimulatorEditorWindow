@@ -27,7 +27,8 @@ public class AnimationSimulatorWindow : EditorWindow
     List<bool> dropDowns = new List<bool>(2) { false, false };
 
     float animSpeed = 2;
-    static float scale = 1.0f;
+    static float sliderAnimSpeed = 1.0f;
+    static float sliderAnimTimestamp = 1.0f;
 
     bool animLoopBtn = true;
 
@@ -115,8 +116,14 @@ public class AnimationSimulatorWindow : EditorWindow
         /*Debug.Log(animatorLabel);*/
         PrintAnimClipData();
 
-        scale = EditorGUILayout.Slider(scale, 0, 2);
+        if (_animationClip)
+        {
+            GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
+            sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
 
+            GUILayout.Label($"Current Animation Timestamp", EditorStyles.boldLabel);
+            sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, _animationClip.length);
+        }
         animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
 
         dropDowns[0] = showAnimatorsDropDown;
@@ -151,8 +158,9 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (GUILayout.Button("Restart"))
         {
+            EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update -= PlayAnimationClip;
-            EditorApplication.update += PlayAnimationClip;
+            EditorApplication.update += RestartAnimationClip;
             endTime = EditorApplication.timeSinceStartup;
             RestartAnimationClip();
         }
@@ -166,6 +174,7 @@ public class AnimationSimulatorWindow : EditorWindow
         if (GUILayout.Button("Play"))
         {
             EditorApplication.update -= PlayAnimationClip;
+            EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update += PlayAnimationClip;
             PlayAnimationClip();
         }
@@ -248,7 +257,6 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!Selection.activeGameObject.TryGetComponent(out _animator))
             return;
 
-
         EditorGUILayout.BeginVertical();
         scrollPosAnimClips = EditorGUILayout.BeginScrollView(scrollPosAnimClips, false, true);
 
@@ -330,7 +338,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
         EditorApplication.update += PlayAnimationClip;
 
-        timeElapsed = scale * (EditorApplication.timeSinceStartup - endTime);
+        timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
         _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
 
         // Loop animation
@@ -357,7 +365,7 @@ public class AnimationSimulatorWindow : EditorWindow
             return;
 
         // Restart at the beginning of the animation clip
-        timeElapsed = scale * (EditorApplication.timeSinceStartup - endTime);
+        timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
         _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
 
         // Loop animation
@@ -369,7 +377,7 @@ public class AnimationSimulatorWindow : EditorWindow
         if (timeElapsed >= _animationClip.length && !animLoopBtn)
         {
             /*timeElapsed = 0;*/
-            EditorApplication.update -= PlayAnimationClip;
+            EditorApplication.update -= RestartAnimationClip;
 
         }
     }
