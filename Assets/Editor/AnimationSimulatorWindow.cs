@@ -23,6 +23,11 @@ public class AnimationSimulatorWindow : EditorWindow
     static bool isPlaying = false;
     static double endTime;
 
+    float animSpeed = 2;
+    static float scale = 1.0f;
+
+    bool animLoopBtn = true;
+
     // Scrollbar
     Vector2 scrollPos = Vector2.zero;
 
@@ -97,6 +102,10 @@ public class AnimationSimulatorWindow : EditorWindow
             ListAnimationClips();
 
         /*Debug.Log(animatorLabel);*/
+
+        scale = EditorGUILayout.Slider(scale, 0, 2);
+
+        animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
 
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
@@ -237,9 +246,17 @@ public class AnimationSimulatorWindow : EditorWindow
 
         double timeElapsed = EditorApplication.timeSinceStartup - endTime;
 
-        _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
+        _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed * scale);
+
+        // Loop animation
+        if (timeElapsed >=_animationClip.length && animLoopBtn)
+        {
+            endTime = EditorApplication.timeSinceStartup;
+        }
+     
     }
 
+    // Get all animators from gameobjects in the scene
     static Animator[] GetAnimatorsInScene()
     {
         Scene scene = SceneManager.GetActiveScene();
