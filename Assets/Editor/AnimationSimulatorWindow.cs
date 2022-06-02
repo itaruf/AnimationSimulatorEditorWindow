@@ -244,9 +244,9 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!isPlaying)
             return;
 
-        double timeElapsed = EditorApplication.timeSinceStartup - endTime;
+        double timeElapsed = scale * (EditorApplication.timeSinceStartup - endTime);
 
-        _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed * scale);
+        _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
 
         // Loop animation
         if (timeElapsed >=_animationClip.length && animLoopBtn)
