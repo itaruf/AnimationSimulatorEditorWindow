@@ -188,11 +188,13 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (GUILayout.Button("Stop"))
         {
-            /*PlayAnimationClip();*/
+            EditorApplication.update -= RestartAnimationClip;
+            EditorApplication.update -= PlayAnimationClip;
+            isPlaying = false;
         }
     }
 
-    void AnimatorsDropDown(int unusedWindowID)
+    void AnimatorsInDropDown(int unusedWindowID)
     {
         /*EditorGUILayout.BeginVertical();
         scrollPosAnimators = EditorGUILayout.BeginScrollView(scrollPosAnimators, false, true);*/
@@ -214,29 +216,22 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void ListAnimators()
     {
-        Rect lastRect;
+        if (!showAnimatorsDropDown)
+            return;
 
         if (EditorGUILayout.DropdownButton(new GUIContent(animatorLabel), FocusType.Passive))
         {
-            lastRect = GUILayoutUtility.GetLastRect();
-            Debug.Log(lastRect.position);
             CloseDropDown();
 
             if (showAnimatorsDropDown)
                 showAnimatorsDropDown = false;
             else
                 showAnimatorsDropDown = true;
-
         }
-
-        if (!showAnimatorsDropDown)
-            return;
 
         // Draw Dropdown
         BeginWindows();
-
-        /*animatorsRect = new Rect()*/
-        animatorsRect = GUILayout.Window(123, animatorsRect, AnimatorsDropDown, "");
+        animatorsRect = GUILayout.Window(123, animatorsRect, AnimatorsInDropDown, "");
 
         if (Event.current.type == EventType.MouseDown)
         {
@@ -249,7 +244,7 @@ public class AnimationSimulatorWindow : EditorWindow
         EndWindows();
     }
 
-    void AnimClipsDropDown(int unusedWindowID)
+    void AnimClipsInDropDown(int unusedWindowID)
     {
         if (!Selection.activeGameObject)
             return;
@@ -270,12 +265,10 @@ public class AnimationSimulatorWindow : EditorWindow
                 showAnimClipsDropDown = false;
                 Selection.activeObject = _animator.gameObject;
 
-                endTime = EditorApplication.timeSinceStartup;
-
+                /*endTime = EditorApplication.timeSinceStartup;*/
                 _animationClip = a;
 
-                isPlaying = true;
-                PlayAnimationClip();
+               /* PlayAnimationClip();*/
             }
         }
         EditorGUILayout.EndScrollView();
@@ -307,7 +300,7 @@ public class AnimationSimulatorWindow : EditorWindow
         // Draw Dropdown
         BeginWindows();
 
-        animClipsRect = GUILayout.Window(123, animClipsRect, AnimClipsDropDown, "");
+        animClipsRect = GUILayout.Window(123, animClipsRect, AnimClipsInDropDown, "");
 
         if (Event.current.type == EventType.MouseDown)
         {
@@ -330,28 +323,32 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!_animator)
             return;
 
-        if (!isPlaying)
-            return;
+        /*if (!isPlaying)
+            return;*/
 
         if (!animLoopBtn)
             EditorApplication.update -= PlayAnimationClip;
 
+        // The animation is now playing
+        isPlaying = true;
         EditorApplication.update += PlayAnimationClip;
 
+        // Play the animation at a specific timestamp
         timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
         _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
 
-        // Loop animation
+        // Loop animation - Restarting chrono
         if (timeElapsed >=_animationClip.length && animLoopBtn)
         {
             endTime = EditorApplication.timeSinceStartup;
         }
 
+        // Stoping the animation from playing 
         if (timeElapsed >= _animationClip.length && !animLoopBtn)
         {
             timeElapsed = 0;
             EditorApplication.update -= PlayAnimationClip;
-
+            isPlaying = false;
         }
     }
 
@@ -361,8 +358,8 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!_animator)
             return;
 
-        if (!isPlaying)
-            return;
+        /*if (!isPlaying)
+            return;*/
 
         // Restart at the beginning of the animation clip
         timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
@@ -374,11 +371,12 @@ public class AnimationSimulatorWindow : EditorWindow
             endTime = EditorApplication.timeSinceStartup;
         }
 
+        // Stoping the animation from playing 
         if (timeElapsed >= _animationClip.length && !animLoopBtn)
         {
-            /*timeElapsed = 0;*/
+            timeElapsed = 0;
             EditorApplication.update -= RestartAnimationClip;
-
+            isPlaying = false;
         }
     }
 
