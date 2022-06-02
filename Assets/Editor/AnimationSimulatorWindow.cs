@@ -21,6 +21,7 @@ public class AnimationSimulatorWindow : EditorWindow
     public Dictionary<int, Animator> pairs = new Dictionary<int, Animator>();
     public AnimationClip _animationClip;
     static bool isPlaying = false;
+    static bool isPaused = false;
     static double endTime;
     double timeElapsed;
 
@@ -160,6 +161,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (GUILayout.Button("Restart"))
         {
+            isPaused = false;
+
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update += RestartAnimationClip;
@@ -175,6 +178,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (GUILayout.Button("Play"))
         {
+            isPaused = false;
+
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update += PlayAnimationClip;
@@ -190,8 +195,15 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (GUILayout.Button("Stop"))
         {
+            if (!isPlaying)
+                return;
+
+            if (isPaused)
+                return;
+
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update -= PlayAnimationClip;
+            isPaused = true;
             isPlaying = false;
         }
     }
@@ -320,6 +332,7 @@ public class AnimationSimulatorWindow : EditorWindow
         dropDowns[1] = showAnimClipsDropDown;
     }
 
+    double startTime;
     private void PlayAnimationClip()
     {
         if (!_animator)
@@ -329,29 +342,39 @@ public class AnimationSimulatorWindow : EditorWindow
             return;
 
         // The animation is now playing
-        if (!isPlaying)
+        if (!isPlaying && !isPaused)
         {
             endTime = EditorApplication.timeSinceStartup;
             isPlaying = true;
         }
 
-        Debug.Log("play normally");
-        // Play the animation at a specific timestamp
-        timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
-        _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
-
-        // Loop animation - Restarting chrono
-        if (timeElapsed >=_animationClip.length && animLoopBtn)
+        if (isPaused)
         {
-            endTime = EditorApplication.timeSinceStartup;
+            startTime = timeElapsed;
         }
 
-        // Stoping the animation from playing 
-        if (timeElapsed >= _animationClip.length && !animLoopBtn)
-        {
-            timeElapsed = 0;
-            EditorApplication.update -= PlayAnimationClip;
-            isPlaying = false;
+        else
+        { 
+            startTime = EditorApplication.timeSinceStartup;
+
+            Debug.Log("play normally");
+            // Play the animation at a specific timestamp
+            timeElapsed = sliderAnimSpeed * (startTime - endTime);
+            _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
+
+            // Loop animation - Restarting chrono
+            if (timeElapsed >= _animationClip.length && animLoopBtn)
+            {
+                endTime = EditorApplication.timeSinceStartup;
+            }
+
+            // Stoping the animation from playing 
+            if (timeElapsed >= _animationClip.length && !animLoopBtn)
+            {
+                timeElapsed = 0;
+                EditorApplication.update -= PlayAnimationClip;
+                isPlaying = false;
+            }
         }
     }
 
@@ -368,22 +391,25 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!isPlaying)
             isPlaying = true;
 
-        // Restart at the beginning of the animation clip
-        timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
-        _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
-
-        // Loop animation - Restarting chrono
-        if (timeElapsed >= _animationClip.length && animLoopBtn)
+        if (!isPaused)
         {
-            endTime = EditorApplication.timeSinceStartup;
-        }
+            // Restart at the beginning of the animation clip
+            timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
+            _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
 
-        // Stoping the animation from playing 
-        if (timeElapsed >= _animationClip.length && !animLoopBtn)
-        {
-            timeElapsed = 0;
-            EditorApplication.update -= RestartAnimationClip;
-            isPlaying = false;
+            // Loop animation - Restarting chrono
+            if (timeElapsed >= _animationClip.length && animLoopBtn)
+            {
+                endTime = EditorApplication.timeSinceStartup;
+            }
+
+            // Stoping the animation from playing 
+            if (timeElapsed >= _animationClip.length && !animLoopBtn)
+            {
+                timeElapsed = 0;
+                EditorApplication.update -= RestartAnimationClip;
+                isPlaying = false;
+            }
         }
     }
 
