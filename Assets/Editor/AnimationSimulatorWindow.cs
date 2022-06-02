@@ -202,9 +202,9 @@ public class AnimationSimulatorWindow : EditorWindow
                 return;
 
             EditorApplication.update -= RestartAnimationClip;
-            EditorApplication.update -= PlayAnimationClip;
+            /*EditorApplication.update -= PlayAnimationClip;*/
             isPaused = true;
-            isPlaying = false;
+            /*isPlaying = false;*/
         }
     }
 
@@ -333,6 +333,7 @@ public class AnimationSimulatorWindow : EditorWindow
     }
 
     double startTime;
+    double pauseTime = 0;
     private void PlayAnimationClip()
     {
         if (!_animator)
@@ -346,20 +347,24 @@ public class AnimationSimulatorWindow : EditorWindow
         {
             endTime = EditorApplication.timeSinceStartup;
             isPlaying = true;
+            pauseTime = 0;
+        }
+
+        if (isPlaying)
+        {
+            startTime = EditorApplication.timeSinceStartup;
         }
 
         if (isPaused)
         {
-            startTime = timeElapsed;
+            pauseTime = EditorApplication.timeSinceStartup;
+            startTime -= pauseTime;
         }
 
         else
-        { 
-            startTime = EditorApplication.timeSinceStartup;
-
-            Debug.Log("play normally");
+        {
             // Play the animation at a specific timestamp
-            timeElapsed = sliderAnimSpeed * (startTime - endTime);
+            timeElapsed = sliderAnimSpeed * (startTime  - endTime);
             _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
 
             // Loop animation - Restarting chrono
