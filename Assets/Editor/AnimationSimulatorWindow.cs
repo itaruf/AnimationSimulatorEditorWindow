@@ -30,6 +30,7 @@ public class AnimationSimulatorWindow : EditorWindow
     static AnimationSimulatorWindow()
     {
         UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += SceneClosing;
+        EditorApplication.playModeStateChanged += LogPlayModeState;
     }
 
     [MenuItem("Window/Animator Simulator")]
@@ -102,6 +103,9 @@ public class AnimationSimulatorWindow : EditorWindow
 
     private void PlayAnimationClip()
     {
+        if (!_animator)
+            return;
+
         if (!isPlaying)
             return;
 
@@ -139,6 +143,13 @@ public class AnimationSimulatorWindow : EditorWindow
     static void SceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingScene)
     {
         Debug.Log("SceneClosing");
+        AnimationSimulatorWindow animationSimulator = new AnimationSimulatorWindow();
+        animationSimulator.OnSceneClosing();
+    }
+
+   static void LogPlayModeState(PlayModeStateChange state)
+    {
+        Debug.Log(state);
         AnimationSimulatorWindow animationSimulator = new AnimationSimulatorWindow();
         animationSimulator.OnSceneClosing();
     }
