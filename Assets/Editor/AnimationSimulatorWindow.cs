@@ -23,6 +23,8 @@ public class AnimationSimulatorWindow : EditorWindow
     static bool isPlaying = false;
     static double endTime;
 
+    List<bool> dropDowns = new List<bool>(2) { false, false };
+
     float animSpeed = 2;
     static float scale = 1.0f;
 
@@ -30,6 +32,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
     // Scrollbar
     Vector2 scrollPos = Vector2.zero;
+    Vector2 scrollPosAnimClips = Vector2.zero;
+    Vector2 scrollPosAnimators = Vector2.zero;
 
     // DropDowns
     static bool showAnimClipsDropDown = false;
@@ -107,6 +111,11 @@ public class AnimationSimulatorWindow : EditorWindow
 
         animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
 
+        dropDowns[0] = showAnimatorsDropDown;
+        dropDowns[1] = showAnimClipsDropDown;
+
+        /*Debug.Log(dropDowns.Count);*/
+
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
     }
@@ -126,6 +135,8 @@ public class AnimationSimulatorWindow : EditorWindow
     {
         if (EditorGUILayout.DropdownButton(new GUIContent(animatorLabel), FocusType.Passive))
         {
+            CloseDropDown();
+
             if (showAnimatorsDropDown)
                 showAnimatorsDropDown = false;
             else
@@ -146,6 +157,7 @@ public class AnimationSimulatorWindow : EditorWindow
                 showAnimatorsDropDown = false;
             }
         }
+
         EndWindows();
     }
 
@@ -158,12 +170,15 @@ public class AnimationSimulatorWindow : EditorWindow
             return;
 
         }
+
         if (EditorGUILayout.DropdownButton(new GUIContent(animClipLabel), FocusType.Passive))
         {
+            CloseDropDown();
+
             if (showAnimClipsDropDown)
                 showAnimClipsDropDown = false;
             else
-            showAnimClipsDropDown = true;
+                showAnimClipsDropDown = true;
         }
 
         if (!showAnimClipsDropDown)
@@ -201,7 +216,6 @@ public class AnimationSimulatorWindow : EditorWindow
                 isAnimatorSelected = true;
             }
         }
-        GUI.DragWindow();
     }
 
     void AnimClipsDropDown(int unusedWindowID)
@@ -215,6 +229,7 @@ public class AnimationSimulatorWindow : EditorWindow
                 return;
 
             AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
+
             foreach (var a in clips)
             {
                 if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
@@ -232,8 +247,15 @@ public class AnimationSimulatorWindow : EditorWindow
                     PlayAnimationClip();
                 }
             }
-            GUI.DragWindow();
         }
+    }
+
+    private void OnEnable()
+    {
+        dropDowns[0] = showAnimatorsDropDown;
+        dropDowns[1] = showAnimClipsDropDown;
+
+        Debug.Log(dropDowns.Count);
     }
 
     private void PlayAnimationClip()
@@ -254,6 +276,15 @@ public class AnimationSimulatorWindow : EditorWindow
             endTime = EditorApplication.timeSinceStartup;
         }
      
+    }
+    void CloseDropDown()
+    {
+        for (int i = 0; i < dropDowns.Count; ++i)
+        {
+            Debug.Log("CLOSING");
+            if (dropDowns[i])
+                dropDowns[i] = false;
+        }
     }
 
     // Get all animators from gameobjects in the scene
