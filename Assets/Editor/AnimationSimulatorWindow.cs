@@ -131,16 +131,41 @@ public class AnimationSimulatorWindow : EditorWindow
         animatorLabel = "Select an animator";
     }
 
+    void AnimatorsDropDown(int unusedWindowID)
+    {
+        EditorGUILayout.BeginVertical();
+        scrollPosAnimators = EditorGUILayout.BeginScrollView(scrollPosAnimators, false, true);
+
+        foreach (var a in _animators)
+        {
+            if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
+            {
+                animatorLabel = a.name;
+                showAnimatorsDropDown = false;
+                Selection.activeObject = a.gameObject;
+                isAnimatorSelected = true;
+            }
+        }
+
+        EditorGUILayout.EndScrollView();
+        EditorGUILayout.EndVertical();
+    }
+
     void ListAnimators()
     {
+        Rect lastRect;
+
         if (EditorGUILayout.DropdownButton(new GUIContent(animatorLabel), FocusType.Passive))
         {
+            lastRect = GUILayoutUtility.GetLastRect();
+            Debug.Log(lastRect.position);
             CloseDropDown();
 
             if (showAnimatorsDropDown)
                 showAnimatorsDropDown = false;
             else
                 showAnimatorsDropDown = true;
+
         }
 
         if (!showAnimatorsDropDown)
@@ -148,6 +173,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
         // Draw Dropdown
         BeginWindows();
+
+        /*animatorsRect = new Rect()*/
         animatorsRect = GUILayout.Window(123, animatorsRect, AnimatorsDropDown, "");
 
         if (Event.current.type == EventType.MouseDown)
@@ -161,63 +188,6 @@ public class AnimationSimulatorWindow : EditorWindow
         EndWindows();
     }
 
-    void ListAnimationClips()
-    {
-        if (!isAnimatorSelected)
-        {
-            showAnimClipsDropDown = false;
-            EndWindows();
-            return;
-
-        }
-
-        if (EditorGUILayout.DropdownButton(new GUIContent(animClipLabel), FocusType.Passive))
-        {
-            CloseDropDown();
-
-            if (showAnimClipsDropDown)
-                showAnimClipsDropDown = false;
-            else
-                showAnimClipsDropDown = true;
-        }
-
-        if (!showAnimClipsDropDown)
-            return;
-
-        // Draw Dropdown
-        BeginWindows();
-        animClipsRect = GUILayout.Window(123, animClipsRect, AnimClipsDropDown, "");
-
-        if (Event.current.type == EventType.MouseDown)
-        {
-            if (animClipsRect.Contains(Event.current.mousePosition) == false)
-            {
-                showAnimClipsDropDown = false;
-            }
-        }
-        EndWindows();
-
-        /* if (GUILayout.Button("STOP"))
-         {
-             EditorApplication.update -= PlayAnimationClip;
-             isPlaying = false;
-         }*/
-    }
-
-    void AnimatorsDropDown(int unusedWindowID)
-    {
-        foreach (var a in _animators)
-        {
-            if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
-            {
-                animatorLabel = a.name;
-                showAnimatorsDropDown = false;
-                Selection.activeObject = a.gameObject;
-                isAnimatorSelected = true;
-            }
-        }
-    }
-
     void AnimClipsDropDown(int unusedWindowID)
     {
         if (!Selection.activeGameObject)
@@ -227,6 +197,9 @@ public class AnimationSimulatorWindow : EditorWindow
         {
             if (!_animator)
                 return;
+
+            EditorGUILayout.BeginVertical();
+            scrollPosAnimClips = EditorGUILayout.BeginScrollView(scrollPosAnimClips, false, true);
 
             AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
 
@@ -247,15 +220,63 @@ public class AnimationSimulatorWindow : EditorWindow
                     PlayAnimationClip();
                 }
             }
+            EditorGUILayout.EndScrollView();
+            EditorGUILayout.EndVertical();
         }
     }
+
+    void ListAnimationClips()
+    {
+        Rect lastRect;
+
+        if (!isAnimatorSelected)
+        {
+            showAnimClipsDropDown = false;
+            EndWindows();
+            return;
+
+        }
+
+        if (EditorGUILayout.DropdownButton(new GUIContent(animClipLabel), FocusType.Passive))
+        {
+            lastRect = GUILayoutUtility.GetLastRect();
+
+            CloseDropDown();
+
+            if (showAnimClipsDropDown)
+                showAnimClipsDropDown = false;
+            else
+                showAnimClipsDropDown = true;
+
+            Debug.Log(lastRect.position);
+        }
+
+        if (!showAnimClipsDropDown)
+            return;
+
+        // Draw Dropdown
+        BeginWindows();
+
+        animClipsRect = GUILayout.Window(123, animClipsRect, AnimClipsDropDown, "");
+
+        if (Event.current.type == EventType.MouseDown)
+        {
+            if (animClipsRect.Contains(Event.current.mousePosition) == false)
+            {
+                showAnimClipsDropDown = false;
+            }
+        }
+        EndWindows();
+    }
+
+  
 
     private void OnEnable()
     {
         dropDowns[0] = showAnimatorsDropDown;
         dropDowns[1] = showAnimClipsDropDown;
 
-        Debug.Log(dropDowns.Count);
+        /*Debug.Log(dropDowns.Count);*/
     }
 
     private void PlayAnimationClip()
@@ -281,9 +302,11 @@ public class AnimationSimulatorWindow : EditorWindow
     {
         for (int i = 0; i < dropDowns.Count; ++i)
         {
-            Debug.Log("CLOSING");
             if (dropDowns[i])
+            {
+                /*Debug.Log(i);*/
                 dropDowns[i] = false;
+            }
         }
     }
 
