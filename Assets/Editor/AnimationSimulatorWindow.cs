@@ -22,6 +22,7 @@ public class AnimationSimulatorWindow : EditorWindow
     public AnimationClip _animationClip;
     static bool isPlaying = false;
     static double endTime;
+    double timeElapsed;
 
     List<bool> dropDowns = new List<bool>(2) { false, false };
 
@@ -64,6 +65,11 @@ public class AnimationSimulatorWindow : EditorWindow
         window.Show();
     }
 
+    private void Update()
+    {
+        Repaint();
+    }
+
     void OnGUI()
     {
         // Find all animators in the scene
@@ -90,6 +96,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
         else
         {
+            _animationClip = null;
             isPlaying = false;
             isAnimatorSelected = false;
             showAnimClipsDropDown = false;
@@ -106,6 +113,7 @@ public class AnimationSimulatorWindow : EditorWindow
             ListAnimationClips();
 
         /*Debug.Log(animatorLabel);*/
+        PrintAnimClipData();
 
         scale = EditorGUILayout.Slider(scale, 0, 2);
 
@@ -120,6 +128,17 @@ public class AnimationSimulatorWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
+    void PrintAnimClipData()
+    {
+        if (!_animationClip)
+            return;
+
+        GUILayout.Label($"Current Animation Data", EditorStyles.boldLabel);
+        GUILayout.Label($"Animation total length : {_animationClip.length}", EditorStyles.label);
+        GUILayout.Label($"Current Animation timestamp : {Math.Round(timeElapsed, 2)}", EditorStyles.label);
+        GUILayout.Label($"Is animation set as Looping: {_animationClip.isLooping}", EditorStyles.label);
+
+    }
     private static void ResetData()
     {
         isPlaying = false;
@@ -133,8 +152,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void AnimatorsDropDown(int unusedWindowID)
     {
-        EditorGUILayout.BeginVertical();
-        scrollPosAnimators = EditorGUILayout.BeginScrollView(scrollPosAnimators, false, true);
+        /*EditorGUILayout.BeginVertical();
+        scrollPosAnimators = EditorGUILayout.BeginScrollView(scrollPosAnimators, false, true);*/
 
         foreach (var a in _animators)
         {
@@ -147,8 +166,8 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
-        EditorGUILayout.EndScrollView();
-        EditorGUILayout.EndVertical();
+        /*EditorGUILayout.EndScrollView();
+        EditorGUILayout.EndVertical();*/
     }
 
     void ListAnimators()
@@ -275,8 +294,6 @@ public class AnimationSimulatorWindow : EditorWindow
     {
         dropDowns[0] = showAnimatorsDropDown;
         dropDowns[1] = showAnimClipsDropDown;
-
-        /*Debug.Log(dropDowns.Count);*/
     }
 
     private void PlayAnimationClip()
@@ -287,7 +304,7 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!isPlaying)
             return;
 
-        double timeElapsed = scale * (EditorApplication.timeSinceStartup - endTime);
+        timeElapsed = scale * (EditorApplication.timeSinceStartup - endTime);
 
         _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
 
@@ -296,7 +313,13 @@ public class AnimationSimulatorWindow : EditorWindow
         {
             endTime = EditorApplication.timeSinceStartup;
         }
-     
+
+        if (timeElapsed >= _animationClip.length && !animLoopBtn)
+        {
+            /*timeElapsed = 0;*/
+            EditorApplication.update -= PlayAnimationClip;
+
+        }
     }
     void CloseDropDown()
     {
