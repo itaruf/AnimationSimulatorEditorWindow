@@ -6,31 +6,30 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using System.Linq;
+using System;
 
 #if UNITY_EDITOR
 [ExecuteInEditMode]
 [CustomEditor(typeof(IdleChanger))]
 public class AnimationSimulatorWindow : EditorWindow
 {
-    public Animator[] _animators;
-    Vector2 scrollPos = Vector2.zero;
-    string t = "This is a string inside a Scroll view!";
     static AnimationSimulatorWindow window;
+
+    // Animation Data
+    public Animator[] _animators;
+    public Animator _animator;
+    public AnimationClip _animationClip;
     bool isPlaying = false;
+    double endTime;
+
+    // Scrollbar
+    Vector2 scrollPos = Vector2.zero;
+
 
     // Subscribing to events
     static AnimationSimulatorWindow()
     {
         UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += SceneClosing;
-    }
-    void Start()
-    {
-        Debug.Log("TEST");
-    }
-
-    void Update()
-    {
-        
     }
 
     [MenuItem("Window/Animator Simulator")]
@@ -40,11 +39,6 @@ public class AnimationSimulatorWindow : EditorWindow
 
         window = (AnimationSimulatorWindow)GetWindowWithRect(typeof(AnimationSimulatorWindow), new Rect(0, 0, 300, 300));
         window.Show();
-    }
-
-    void Init()
-    {
-
     }
 
     void OnGUI()
@@ -61,7 +55,7 @@ public class AnimationSimulatorWindow : EditorWindow
         ListAnimators();
 
         // List all animations of the selected animator
-        ListAnimations();
+        ListAnimationClips();
 
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
@@ -76,31 +70,47 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    void ListAnimations()
+    void ListAnimationClips()
     {
         if (Selection.activeGameObject)
         {
-            if (Selection.activeGameObject.TryGetComponent(out Animator animator))
+            if (Selection.activeGameObject.TryGetComponent(out _animator))
             {
-                AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
+                AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
                 foreach (var a in clips)
                 {
                     if (GUILayout.Button(a.name))
                     {
+                        endTime = EditorApplication.timeSinceStartup;
+
+                        _animationClip = a;
+
+                        EditorApplication.update += PlayAnimationClip;
+                        isPlaying = true;
+                        PlayAnimationClip();
+                    }
+
+                    if (GUILayout.Button("STOP"))
+                    {
+                        EditorApplication.update -= PlayAnimationClip;
                         isPlaying = false;
-                        PlayClip(a, animator);
                     }
                 }
             }
         }
     }
 
-    void PlayClip(AnimationClip clip, Animator animator)
+    private void PlayAnimationClip()
     {
-        isPlaying = true;
+        if (!isPlaying)
+            return;
 
-        clip.SampleAnimation(animator.gameObject, Time.deltaTime);
-        animator.Update(Time.deltaTime);
+        Debug.Log(_animationClip.name);
+        Debug.Log(_animator.gameObject.name);
+
+        double timeElapsed = EditorApplication.timeSinceStartup - endTime;
+
+        _animationClip.SampleAnimation(_animator.gameObject, (float) timeElapsed);
     }
 
     static Animator[] GetAnimatorsInScene()
@@ -120,9 +130,17 @@ public class AnimationSimulatorWindow : EditorWindow
         return AnimatorList.ToArray();
     }
 
+    void OnSceneClosing()
+    {
+        isPlaying = false;
+        EditorApplication.update -= PlayAnimationClip;
+    }
+
     static void SceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingScene)
     {
         Debug.Log("SceneClosing");
+        AnimationSimulatorWindow animationSimulator = new AnimationSimulatorWindow();
+        animationSimulator.OnSceneClosing();
     }
 }
 
