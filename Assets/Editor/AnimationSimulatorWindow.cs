@@ -103,6 +103,8 @@ public class AnimationSimulatorWindow : EditorWindow
             showAnimClipsDropDown = false;
             animClipLabel = "Select an animation clip";
             animatorLabel = "Select an animator";
+            EditorApplication.update -= RestartAnimationClip;
+            EditorApplication.update -= PlayAnimationClip;
         }
 
         // List all animators in the scene
@@ -326,12 +328,14 @@ public class AnimationSimulatorWindow : EditorWindow
         /*if (!isPlaying)
             return;*/
 
-        if (!animLoopBtn)
-            EditorApplication.update -= PlayAnimationClip;
+        if (!_animationClip)
+            return;
 
         // The animation is now playing
         isPlaying = true;
-        EditorApplication.update += PlayAnimationClip;
+
+        if (!animLoopBtn)
+            EditorApplication.update -= PlayAnimationClip;
 
         // Play the animation at a specific timestamp
         timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
@@ -358,8 +362,13 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!_animator)
             return;
 
-        /*if (!isPlaying)
-            return;*/
+        if (!_animationClip)
+            return;
+
+        if (!isPlaying)
+        {
+            isPlaying = true;
+        }
 
         // Restart at the beginning of the animation clip
         timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
