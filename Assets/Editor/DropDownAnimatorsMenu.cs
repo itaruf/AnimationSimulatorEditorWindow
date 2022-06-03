@@ -18,7 +18,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
     public override void DrawDropDown()
     {
         BeginWindows();
-        rect = GUILayout.Window(123, rect, PopulateDropDown, "");
+        rect = GUILayout.Window(200, rect, PopulateDropDown, "");
 
         if (Event.current.type == EventType.MouseDown)
         {
@@ -35,7 +35,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
             Reset();
   
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-            if (animator)
+            /*if (animator)*/
                 showDropDown = !showDropDown;
     }
 
