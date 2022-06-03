@@ -18,6 +18,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
         BeginWindows();
         rect = GUILayout.Window(123, rect, PopulateDropDown, "");
+        SearchField();
 
         if (Event.current.type == EventType.MouseDown)
         {
@@ -58,6 +59,9 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
         foreach (var a in clips)
         {
+            if (!a.name.ToUpper().Contains(strResult.ToUpper()) && searchField.HasFocus())
+                continue;
+
             if (GUILayout.Button(a.name))
             {
                 label = a.name;
@@ -94,5 +98,6 @@ public class DropDownAnimClipsMenu : DropDownMenu
                 return;
             }
         }
+        CloseDropDown();
     }
 }

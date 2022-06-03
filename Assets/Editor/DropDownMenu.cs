@@ -46,5 +46,6 @@ public abstract class DropDownMenu : EditorWindow
     public void CloseDropDown()
     {
         showDropDown = false;
+        strResult = "";
     }
 }

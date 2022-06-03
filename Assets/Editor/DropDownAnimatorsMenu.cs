@@ -18,8 +18,6 @@ public class DropDownAnimatorsMenu : DropDownMenu
     {
         BeginWindows();
         rect = GUILayout.Window(200, rect, PopulateDropDown, "");
-
-        /*EditorApplication.update += SearchField;*/
         SearchField();
 
         if (Event.current.type == EventType.MouseDown)
@@ -65,5 +63,6 @@ public class DropDownAnimatorsMenu : DropDownMenu
     public override void Reset()
     {
         label = "Select an animator";
+        CloseDropDown();
     }
 }
