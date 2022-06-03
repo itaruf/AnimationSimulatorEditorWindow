@@ -82,6 +82,7 @@ public class AnimationSimulatorWindow : EditorWindow
             if (!dropdownMenus.Contains(animClipsMenu))
                 dropdownMenus.Add(animClipsMenu);
             animatorsMenu.onAnimatorChange += animClipsMenu.Reset;
+            Selection.selectionChanged += animClipsMenu.Reset;
         }
 
         // Find all animators in the scene
@@ -302,15 +303,6 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void ResetData()
     {
-    }
-
-    void CloseDropDown()
-    {
-        foreach(var dd in dropdownMenus)
-        {
-            if (dd.showDropDown)
-                dd.showDropDown = false;
-        }
     }
 
     // Get all animators from gameobjects in the scene
