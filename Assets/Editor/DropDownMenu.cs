@@ -15,8 +15,7 @@ public abstract class DropDownMenu : EditorWindow
     public Animator[] animators;
     public Animator animator;
 
-    public delegate void MyDelegate();
-    public MyDelegate my;
+
 
     public abstract void DropDownButton();
 

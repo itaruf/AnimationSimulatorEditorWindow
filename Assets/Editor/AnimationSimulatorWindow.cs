@@ -81,10 +81,8 @@ public class AnimationSimulatorWindow : EditorWindow
             animClipsMenu = CreateInstance<DropDownAnimClipsMenu>();
             if (!dropdownMenus.Contains(animClipsMenu))
                 dropdownMenus.Add(animClipsMenu);
+            animatorsMenu.onAnimatorChange += animClipsMenu.Reset;
         }
-
-        if (animatorsMenu)
-            animatorsMenu.my += animClipsMenu.Reset;
 
         // Find all animators in the scene
         animatorsMenu.animators = GetAnimatorsInScene();

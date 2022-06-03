@@ -7,6 +7,9 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class DropDownAnimatorsMenu : DropDownMenu
 {
+    public delegate void OnAnimatorChange();
+    public OnAnimatorChange onAnimatorChange;
+
     DropDownAnimatorsMenu()
     {
         label = "Select an animator";
@@ -48,11 +51,10 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
                 showDropDown = false;
                 Selection.activeObject = a.gameObject;
-                /*isAnimatorSelected = true;*/
                 animator = a;
                 label = a.name;
 
-                my?.Invoke();
+                onAnimatorChange?.Invoke();
             }
         }
     }
