@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEditor.IMGUI.Controls;
 
 [ExecuteInEditMode]
 public class DropDownAnimatorsMenu : DropDownMenu
@@ -17,12 +18,13 @@ public class DropDownAnimatorsMenu : DropDownMenu
         BeginWindows();
         rect = GUILayout.Window(200, rect, PopulateDropDown, "");
 
+        SearchField();
+
         if (Event.current.type == EventType.MouseDown)
         {
             if (!rect.Contains(Event.current.mousePosition))
                 showDropDown = false;
         }
-
         EndWindows();
     }
 
