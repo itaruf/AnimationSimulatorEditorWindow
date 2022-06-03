@@ -14,6 +14,12 @@ public abstract class DropDownMenu : EditorWindow
     public Animator animator;
 
     public SearchField searchField;
+    public string strResult = " ";
+
+   /* private void OnEnable()
+    {
+        EditorApplication.update += SearchField;
+    }*/
 
     public abstract void DropDownButton();
 
@@ -33,8 +39,7 @@ public abstract class DropDownMenu : EditorWindow
         if (searchField == null)
             searchField = new SearchField();
 
-       searchField.OnToolbarGUI("Find an animator...");
-
+        strResult = searchField.OnToolbarGUI(strResult);
         GUILayout.EndHorizontal();
     }
 }

@@ -18,6 +18,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
         BeginWindows();
         rect = GUILayout.Window(200, rect, PopulateDropDown, "");
 
+        /*EditorApplication.update += SearchField;*/
         SearchField();
 
         if (Event.current.type == EventType.MouseDown)
@@ -34,7 +35,6 @@ public class DropDownAnimatorsMenu : DropDownMenu
             Reset();
   
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-            /*if (animator)*/
                 showDropDown = !showDropDown;
     }
 
@@ -42,10 +42,15 @@ public class DropDownAnimatorsMenu : DropDownMenu
     {
         foreach (var a in animators)
         {
+            if (!a.name.Contains(strResult) && searchField.HasFocus())
+                continue;
+
             if (GUILayout.Button(a.name))
             {
                 if (animator == a)
                     return;
+
+                Debug.Log(true);
 
                 showDropDown = false;
                 Selection.activeObject = a.gameObject;
