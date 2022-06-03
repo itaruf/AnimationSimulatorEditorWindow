@@ -8,6 +8,7 @@ using UnityEngine.UIElements;
 using System.Linq;
 using System;
 using UnityEditor.SceneManagement;
+using System.Diagnostics;
 
 #if UNITY_EDITOR
 [ExecuteInEditMode]
@@ -35,6 +36,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
     List<DropDownMenu> dropdownMenus = new List<DropDownMenu>();
 
+    public Stopwatch stopwatch = new Stopwatch();
+
     // Subscribing to events
     static AnimationSimulatorWindow()
     {
@@ -58,6 +61,10 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void OnGUI()
     {
+        /*zeit.Start();
+        UnityEngine.Debug.Log(zeit.Elapsed);*/
+
+
         /*Instanciation des dropdown menus*/
         if (!animatorsMenu)
         {
@@ -122,6 +129,7 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
+        // If an animator was selected, make sure to retarget its gameobject when going back in the anim window
         SetFocusBackToGameObject();
 
         EditorGUILayout.EndScrollView();
@@ -161,7 +169,7 @@ public class AnimationSimulatorWindow : EditorWindow
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update += RestartAnimationClip;
-            endTime = EditorApplication.timeSinceStartup;
+            stopwatch.Restart();
             RestartAnimationClip();
         }
     }
@@ -180,7 +188,6 @@ public class AnimationSimulatorWindow : EditorWindow
             EditorApplication.update += PlayAnimationClip;
             PlayAnimationClip();
         }
-
     }
 
     void StopClipBtn()
@@ -265,18 +272,21 @@ public class AnimationSimulatorWindow : EditorWindow
 
         // The animation is now playing
         if (!isPlaying)
+        {
             isPlaying = true;
+            /*sliderAnimTimestamp = 0;*/
+        }
 
         if (!isPaused)
         {
             // Restart at the beginning of the animation clip
-            timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
+            timeElapsed = sliderAnimSpeed * stopwatch.Elapsed.TotalSeconds;
             animClipsMenu.animationClip.SampleAnimation(animatorsMenu.animator.gameObject, (float)timeElapsed);
 
             // Loop animation - Restarting chrono
             if (timeElapsed >= animClipsMenu.animationClip.length && animLoopBtn)
             {
-                endTime = EditorApplication.timeSinceStartup;
+                stopwatch.Restart();
             }
 
             // Stoping the animation from playing 
@@ -285,6 +295,8 @@ public class AnimationSimulatorWindow : EditorWindow
                 timeElapsed = 0;
                 EditorApplication.update -= RestartAnimationClip;
                 isPlaying = false;
+                stopwatch.Reset();
+                stopwatch.Stop();
             }
         }
     }
@@ -329,7 +341,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
-        Debug.Log("SceneOpened");
+        UnityEngine.Debug.Log("SceneOpened");
         Selection.activeGameObject = null;
         animatorsMenu = null;
         animClipsMenu = null;
@@ -337,12 +349,12 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
-        Debug.Log("SceneOpening");
+        UnityEngine.Debug.Log("SceneOpening");
     }
    
     static void SceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingScene)
     {
-        Debug.Log("SceneClosing");
+        UnityEngine.Debug.Log("SceneClosing");
         OnSceneClosing();
     }
 
