@@ -226,6 +226,11 @@ public class AnimationSimulatorWindow : EditorWindow
 
         else
         {
+            if (isPaused)
+            {
+                stopwatch.Stop();
+            }
+
             // Play the animation at a specific timestamp
             timeElapsed = sliderAnimSpeed * (stopwatch.Elapsed.TotalSeconds + sliderAnimTimestamp);
             animClipsMenu.animationClip.SampleAnimation(animatorsMenu.animator.gameObject, (float)timeElapsed);
