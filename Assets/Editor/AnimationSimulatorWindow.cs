@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityChan;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
-using System.Linq;
 using System;
 using UnityEditor.SceneManagement;
 using System.Diagnostics;
@@ -20,7 +16,6 @@ public class AnimationSimulatorWindow : EditorWindow
     public Animator animator = new Animator();
     static bool isPlaying = false;
     static bool isPaused = false;
-    static double endTime;
     double timeElapsed;
 
     static float sliderAnimSpeed = 1.0f;
