@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class DropDownAnimClipsMenu : DropDownMenu
 {
     public Animator[] animators;
@@ -48,7 +49,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
         foreach (var a in clips)
         {
-            if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button(a.name))
             {
                 label = a.name;
                 showDropDown = false;

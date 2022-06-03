@@ -30,8 +30,8 @@ public class AnimationSimulatorWindow : EditorWindow
     Vector2 scrollPos = Vector2.zero;
 
     // Menus
-    DropDownAnimatorsMenu animatorsMenu;
-    DropDownAnimClipsMenu animClipsMenu;
+    static DropDownAnimatorsMenu animatorsMenu;
+    static DropDownAnimClipsMenu animClipsMenu;
 
     List<DropDownMenu> dropdownMenus = new List<DropDownMenu>();
 
@@ -125,12 +125,11 @@ public class AnimationSimulatorWindow : EditorWindow
 
                 animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
 
+                RestartClipBtn();
+                PlayClipBtn();
+                StopClipBtn();
             }
         }
-
-        RestartClipBtn();
-        PlayClipBtn();
-        StopClipBtn();
 
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
@@ -329,8 +328,11 @@ public class AnimationSimulatorWindow : EditorWindow
     static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
         Debug.Log("SceneOpened");
+        Selection.activeGameObject = null;
+        animatorsMenu = null;
+        animClipsMenu = null;
     }
-    
+
     static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
         Debug.Log("SceneOpening");

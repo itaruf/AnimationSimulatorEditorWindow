@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class DropDownAnimatorsMenu : DropDownMenu
 {
     public Animator[] animators;
@@ -33,7 +34,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
     {
         foreach (var a in animators)
         {
-            if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button(a.name))
             {
                 showDropDown = false;
                 Selection.activeObject = a.gameObject;
