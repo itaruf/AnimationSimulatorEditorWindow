@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.IMGUI.Controls;
+using System;
 
 [ExecuteInEditMode]
 public class DropDownAnimatorsMenu : DropDownMenu
@@ -42,7 +43,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
     {
         foreach (var a in animators)
         {
-            if (!a.name.Contains(strResult) && searchField.HasFocus())
+            if (!a.name.ToUpper().Contains(strResult.ToUpper()) && searchField.HasFocus())
                 continue;
 
             if (GUILayout.Button(a.name))
@@ -50,9 +51,8 @@ public class DropDownAnimatorsMenu : DropDownMenu
                 if (animator == a)
                     return;
 
-                Debug.Log(true);
+                CloseDropDown();
 
-                showDropDown = false;
                 Selection.activeObject = a.gameObject;
                 animator = a;
                 label = a.name;

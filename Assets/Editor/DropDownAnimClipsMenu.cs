@@ -61,7 +61,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
             if (GUILayout.Button(a.name))
             {
                 label = a.name;
-                showDropDown = false;
+                CloseDropDown();
                 Selection.activeObject = animator.gameObject;
                 animationClip = a;
             }

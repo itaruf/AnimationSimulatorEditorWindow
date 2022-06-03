@@ -42,4 +42,9 @@ public abstract class DropDownMenu : EditorWindow
         strResult = searchField.OnToolbarGUI(strResult);
         GUILayout.EndHorizontal();
     }
+
+    public void CloseDropDown()
+    {
+        showDropDown = false;
+    }
 }
