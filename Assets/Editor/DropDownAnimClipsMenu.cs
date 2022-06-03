@@ -73,6 +73,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
     public override void Reset()
     {
-        
+        label = "Select an animation";
+        animationClip = null;
     }
 }

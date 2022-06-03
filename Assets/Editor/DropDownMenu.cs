@@ -15,14 +15,10 @@ public abstract class DropDownMenu : EditorWindow
     public Animator[] animators;
     public Animator animator;
 
-    public abstract void DropDownButton();
-  /*  {
-        *//*if (!animator)
-            return;
+    public delegate void MyDelegate();
+    public MyDelegate my;
 
-        if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-            showDropDown = !showDropDown;*//*
-    }*/
+    public abstract void DropDownButton();
 
     public abstract void DrawDropDown();
 

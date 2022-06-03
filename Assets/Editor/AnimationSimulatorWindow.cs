@@ -17,6 +17,7 @@ public class AnimationSimulatorWindow : EditorWindow
     static AnimationSimulatorWindow window;
 
     // Animation Data
+    public Animator animator = new Animator();
     static bool isPlaying = false;
     static bool isPaused = false;
     static double endTime;
@@ -82,6 +83,9 @@ public class AnimationSimulatorWindow : EditorWindow
                 dropdownMenus.Add(animClipsMenu);
         }
 
+        if (animatorsMenu)
+            animatorsMenu.my += animClipsMenu.Reset;
+
         // Find all animators in the scene
         animatorsMenu.animators = GetAnimatorsInScene();
 
@@ -94,7 +98,6 @@ public class AnimationSimulatorWindow : EditorWindow
         {
             if (Selection.activeGameObject.TryGetComponent(out animatorsMenu.animator))
             {
-                animClipsMenu.animator = animatorsMenu.animator;
                 animatorsMenu.label = animatorsMenu.animator.gameObject.name + " " + animatorsMenu.animator.gameObject.GetInstanceID().ToString();
                 Selection.activeGameObject = animatorsMenu.animator.gameObject;
             }
@@ -107,6 +110,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (animatorsMenu.animator)
         {
+            animClipsMenu.animator = animatorsMenu.animator;
+
             animClipsMenu.DropDownButton();
 
             // Print the animation clips list only if we click on the drop down button

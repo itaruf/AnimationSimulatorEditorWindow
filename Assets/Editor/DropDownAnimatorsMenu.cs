@@ -43,11 +43,16 @@ public class DropDownAnimatorsMenu : DropDownMenu
         {
             if (GUILayout.Button(a.name))
             {
+                if (animator == a)
+                    return;
+
                 showDropDown = false;
                 Selection.activeObject = a.gameObject;
                 /*isAnimatorSelected = true;*/
                 animator = a;
                 label = a.name;
+
+                my?.Invoke();
             }
         }
     }
