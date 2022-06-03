@@ -113,7 +113,7 @@ public class AnimationSimulatorWindow : EditorWindow
                 GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
                 sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
 
-                GUILayout.Label($"Current Animation Timestamp", EditorStyles.boldLabel);
+                GUILayout.Label($"Animation Starting Timestamp", EditorStyles.boldLabel);
                 sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
                 PrintAnimClipData();
 
@@ -210,8 +210,6 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    double startTime;
-    double pauseTime = 0;
     private void PlayAnimationClip()
     {
         if (!animatorsMenu.animator)
@@ -222,17 +220,12 @@ public class AnimationSimulatorWindow : EditorWindow
 
         // The animation is now playing
         if (!isPlaying && !isPaused)
-        {
             isPlaying = true;
-            pauseTime = 0;
-        }
 
         else
         {
             if (isPaused)
-            {
                 stopwatch.Stop();
-            }
 
             // Play the animation at a specific timestamp
             timeElapsed = sliderAnimSpeed * (stopwatch.Elapsed.TotalSeconds + sliderAnimTimestamp);
@@ -267,10 +260,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
         // The animation is now playing
         if (!isPlaying)
-        {
             isPlaying = true;
-            /*sliderAnimTimestamp = 0;*/
-        }
 
         if (!isPaused)
         {
@@ -280,9 +270,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
             // Loop animation - Restarting chrono
             if (timeElapsed >= animClipsMenu.animationClip.length && animLoopBtn)
-            {
                 stopwatch.Restart();
-            }
 
             // Stoping the animation from playing 
             if (timeElapsed >= animClipsMenu.animationClip.length && !animLoopBtn)

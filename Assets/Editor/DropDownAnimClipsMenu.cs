@@ -36,12 +36,6 @@ public class DropDownAnimClipsMenu : DropDownMenu
         if (!animator)
             return;
 
-        /*if (!Selection.activeGameObject)
-            return;
-
-        if (!Selection.activeGameObject.TryGetComponent(out animator))
-            return;*/
-
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, true);
 
