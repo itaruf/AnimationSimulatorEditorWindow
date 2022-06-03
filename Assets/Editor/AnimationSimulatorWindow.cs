@@ -16,18 +16,11 @@ public class AnimationSimulatorWindow : EditorWindow
     static AnimationSimulatorWindow window;
 
     // Animation Data
-    private Animator[] _animators;
-    private Animator _animator;
-    private Dictionary<int, Animator> pairs = new Dictionary<int, Animator>();
-    private AnimationClip _animationClip;
     static bool isPlaying = false;
     static bool isPaused = false;
     static double endTime;
     double timeElapsed;
 
-    List<bool> dropDowns = new List<bool>(2) { false, false };
-
-    float animSpeed = 2;
     static float sliderAnimSpeed = 1.0f;
     static float sliderAnimTimestamp = 1.0f;
 
@@ -35,34 +28,25 @@ public class AnimationSimulatorWindow : EditorWindow
 
     // Scrollbar
     Vector2 scrollPos = Vector2.zero;
-    Vector2 scrollPosAnimClips = Vector2.zero;
-    Vector2 scrollPosAnimators = Vector2.zero;
 
-    // DropDowns
-    static bool showAnimClipsDropDown = false;
-    static string animClipLabel = "Select an animation clip";
-    private Rect animClipsRect = new Rect(100, 100, 200, 200);
+    // Menus
+    DropDownAnimatorsMenu animatorsMenu;
+    DropDownAnimClipsMenu animClipsMenu;
 
-    static bool showAnimatorsDropDown = false;
-    static string animatorLabel = "Select an animator";
-    private Rect animatorsRect = new Rect(100, 100, 200, 200);
-
-    static bool isAnimatorSelected = false;
+    List<DropDownMenu> dropdownMenus = new List<DropDownMenu>();
 
     // Subscribing to events
     static AnimationSimulatorWindow()
     {
-        UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += SceneClosing;
+        EditorSceneManager.sceneClosing += SceneClosing;
+        EditorSceneManager.sceneOpening += SceneOpening;
+        EditorSceneManager.sceneOpened += SceneOpened;
         EditorApplication.playModeStateChanged += LogPlayModeState;
     }
 
     [MenuItem("Window/Animator Simulator")]
     private static void ShowWindow()
     {
-        UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += SceneClosing;
-        UnityEditor.SceneManagement.EditorSceneManager.sceneOpening += SceneOpening;
-        UnityEditor.SceneManagement.EditorSceneManager.sceneOpened += SceneOpened;
-
         window = (AnimationSimulatorWindow)GetWindowWithRect(typeof(AnimationSimulatorWindow), new Rect(0, 0, 300, 300));
         window.Show();
     }
@@ -74,70 +58,79 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void OnGUI()
     {
+        /*Instanciation des dropdown menus*/
+        if (!animatorsMenu)
+        {
+            animatorsMenu = CreateInstance<DropDownAnimatorsMenu>();
+            if (!dropdownMenus.Contains(animatorsMenu))
+                dropdownMenus.Add(animatorsMenu);
+        }
+
+        if (!animClipsMenu)
+        {
+            animClipsMenu = CreateInstance<DropDownAnimClipsMenu>();
+            if (!dropdownMenus.Contains(animClipsMenu))
+                dropdownMenus.Add(animClipsMenu);
+        }
+
         // Find all animators in the scene
-        _animators = GetAnimatorsInScene();
+        animatorsMenu.animators = GetAnimatorsInScene();
 
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, false);
 
-        GUILayout.Label($"Animators : {_animators.Length}", EditorStyles.boldLabel);
+        GUILayout.Label($"Animators : {animatorsMenu.animators.Length}", EditorStyles.boldLabel);
 
         if (Selection.activeGameObject)
         {
-            if (!Selection.activeGameObject.TryGetComponent(out _animator))
+            if (!Selection.activeGameObject.TryGetComponent(out animatorsMenu.animator))
             {
                 ResetData();
             }
             else
             {
-                isAnimatorSelected = true;
-                animatorLabel = _animator.gameObject.name + " " + _animator.gameObject.GetInstanceID().ToString();
-                Selection.activeGameObject = _animator.gameObject;
+                animClipsMenu.animator = animatorsMenu.animator;
+                animatorsMenu.label = animatorsMenu.animator.gameObject.name + " " + animatorsMenu.animator.gameObject.GetInstanceID().ToString();
+                Selection.activeGameObject = animatorsMenu.animator.gameObject;
             }
         }
 
         else
         {
-            _animationClip = null;
             isPlaying = false;
-            isAnimatorSelected = false;
-            showAnimClipsDropDown = false;
-            animClipLabel = "Select an animation clip";
-            animatorLabel = "Select an animator";
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update -= PlayAnimationClip;
         }
 
-        // List all animators in the scene
-        ListAnimators();
+        animatorsMenu.DropDownButton();
 
-        // List all animations of the selected animator
+        if (animatorsMenu.showDropDown)
+            animatorsMenu.DrawDropDown();
 
-        if (isAnimatorSelected)
-            ListAnimationClips();
-
-        /*Debug.Log(animatorLabel);*/
-        PrintAnimClipData();
-
-        if (_animationClip)
+        if (animatorsMenu.animator)
         {
-            GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
-            sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
+            animClipsMenu.DropDownButton();
 
-            GUILayout.Label($"Current Animation Timestamp", EditorStyles.boldLabel);
-            sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, _animationClip.length);
+            if (animClipsMenu.showDropDown)
+                animClipsMenu.DrawDropDown();
+
+            if (animClipsMenu.animationClip)
+            {
+                GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
+                sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
+
+                GUILayout.Label($"Current Animation Timestamp", EditorStyles.boldLabel);
+                sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
+                PrintAnimClipData();
+
+                animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
+
+            }
         }
-        if (_animationClip)
-            animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
-
-        dropDowns[0] = showAnimatorsDropDown;
-        dropDowns[1] = showAnimClipsDropDown;
 
         RestartClipBtn();
         PlayClipBtn();
         StopClipBtn();
-
-        /*Debug.Log(dropDowns.Count);*/
 
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
@@ -145,19 +138,19 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void PrintAnimClipData()
     {
-        if (!_animationClip)
+        if (!animClipsMenu.animationClip)
             return;
 
         GUILayout.Label($"Current Animation Data", EditorStyles.boldLabel);
-        GUILayout.Label($"Animation total length : {_animationClip.length}", EditorStyles.label);
+        GUILayout.Label($"Animation total length : {animClipsMenu.animationClip.length}", EditorStyles.label);
         GUILayout.Label($"Current Animation timestamp : {Math.Round(timeElapsed, 2)}", EditorStyles.label);
-        GUILayout.Label($"Is animation set as Looping: {_animationClip.isLooping}", EditorStyles.label);
+        GUILayout.Label($"Is animation set as Looping: {animClipsMenu.animationClip.isLooping}", EditorStyles.label);
     }
 
     // Restart Button to restart the current animation clip
     void RestartClipBtn()
     {
-        if (!_animationClip)
+        if (!animClipsMenu.animationClip)
             return;
 
         if (GUILayout.Button("Restart"))
@@ -174,7 +167,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void PlayClipBtn()
     {
-        if (!_animationClip)
+        if (!animClipsMenu.animationClip)
             return;
 
         if (GUILayout.Button("Play"))
@@ -191,7 +184,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void StopClipBtn()
     {
-        if (!_animationClip)
+        if (!animClipsMenu.animationClip)
             return;
 
         if (GUILayout.Button("Stop"))
@@ -209,140 +202,14 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    void ListAnimators()
-    {
-        if (EditorGUILayout.DropdownButton(new GUIContent(animatorLabel), FocusType.Passive))
-        {
-            /*CloseDropDown();*/
-
-            if (showAnimatorsDropDown)
-                showAnimatorsDropDown = false;
-            else
-                showAnimatorsDropDown = true;
-        }
-
-        if (!showAnimatorsDropDown)
-            return;
-
-        // Draw Dropdown
-        BeginWindows();
-        animatorsRect = GUILayout.Window(123, animatorsRect, AnimatorsInDropDown, "");
-
-        if (Event.current.type == EventType.MouseDown)
-        {
-            if (animatorsRect.Contains(Event.current.mousePosition) == false)
-            {
-                showAnimatorsDropDown = false;
-            }
-        }
-
-        EndWindows();
-    }
-
-    void AnimatorsInDropDown(int unusedWindowID)
-    {
-        /*EditorGUILayout.BeginVertical();
-        scrollPosAnimators = EditorGUILayout.BeginScrollView(scrollPosAnimators, false, true);*/
-
-        if (!showAnimatorsDropDown)
-            return;
-
-        foreach (var a in _animators)
-        {
-            if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
-            {
-                animatorLabel = a.name;
-                showAnimatorsDropDown = false;
-                Selection.activeObject = a.gameObject;
-                isAnimatorSelected = true;
-            }
-        }
-
-        /*EditorGUILayout.EndScrollView();
-        EditorGUILayout.EndVertical();*/
-    }
-    void ListAnimationClips()
-    {
-        if (!isAnimatorSelected)
-        {
-            showAnimClipsDropDown = false;
-            /*EndWindows();*/
-            return;
-        }
-
-        if (EditorGUILayout.DropdownButton(new GUIContent(animClipLabel), FocusType.Passive))
-        {
-            CloseDropDown();
-
-            if (showAnimClipsDropDown)
-                showAnimClipsDropDown = false;
-            else
-                showAnimClipsDropDown = true;
-        }
-
-        if (!showAnimClipsDropDown)
-            return;
-
-        // Draw Dropdown
-        BeginWindows();
-
-        animClipsRect = GUILayout.Window(123, animClipsRect, AnimClipsInDropDown, "");
-
-        if (Event.current.type == EventType.MouseDown)
-        {
-            if (animClipsRect.Contains(Event.current.mousePosition) == false)
-            {
-                showAnimClipsDropDown = false;
-            }
-        }
-        EndWindows();
-    }
-
-    void AnimClipsInDropDown(int unusedWindowID)
-    {
-        if (!Selection.activeGameObject)
-            return;
-
-        if (!Selection.activeGameObject.TryGetComponent(out _animator))
-            return;
-
-        EditorGUILayout.BeginVertical();
-        scrollPosAnimClips = EditorGUILayout.BeginScrollView(scrollPosAnimClips, false, true);
-
-        AnimationClip[] clips = _animator.runtimeAnimatorController.animationClips;
-
-        foreach (var a in clips)
-        {
-            if (GUILayout.Button(a.name, GUILayout.ExpandWidth(true)))
-            {
-                animClipLabel = a.name;
-                showAnimClipsDropDown = false;
-                Selection.activeObject = _animator.gameObject;
-
-                /*endTime = EditorApplication.timeSinceStartup;*/
-                _animationClip = a;
-
-               /* PlayAnimationClip();*/
-            }
-        }
-        EditorGUILayout.EndScrollView();
-        EditorGUILayout.EndVertical();
-    }
-
-    private void OnEnable()
-    {
-        dropDowns[0] = showAnimatorsDropDown;
-        dropDowns[1] = showAnimClipsDropDown;
-    }
-
     double startTime;
     double pauseTime = 0;
     private void PlayAnimationClip()
     {
-        if (!_animator)
+        if (!animatorsMenu.animator)
             return;
 
-        if (!_animationClip)
+        if (!animClipsMenu.animationClip)
             return;
 
         // The animation is now playing
@@ -357,23 +224,22 @@ public class AnimationSimulatorWindow : EditorWindow
         {
             pauseTime = EditorApplication.timeSinceStartup;
             startTime -= pauseTime - endTime;
-            Debug.Log(startTime);
         }
 
         else
         {
             // Play the animation at a specific timestamp
             timeElapsed = sliderAnimSpeed * (startTime - endTime);
-            _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
+            animClipsMenu.animationClip.SampleAnimation(animatorsMenu.animator.gameObject, (float)timeElapsed);
 
             // Loop animation - Restarting chrono
-            if (timeElapsed >= _animationClip.length && animLoopBtn)
+            if (timeElapsed >= animClipsMenu.animationClip.length && animLoopBtn)
             {
                 endTime = EditorApplication.timeSinceStartup;
             }
 
             // Stoping the animation from playing 
-            if (timeElapsed >= _animationClip.length && !animLoopBtn)
+            if (timeElapsed >= animClipsMenu.animationClip.length && !animLoopBtn)
             {
                 timeElapsed = 0;
                 EditorApplication.update -= PlayAnimationClip;
@@ -390,10 +256,10 @@ public class AnimationSimulatorWindow : EditorWindow
     /*RESTART*/
     private void RestartAnimationClip()
     {
-        if (!_animator)
+        if (!animatorsMenu.animator)
             return;
 
-        if (!_animationClip)
+        if (!animClipsMenu.animationClip)
             return;
 
         // The animation is now playing
@@ -404,16 +270,16 @@ public class AnimationSimulatorWindow : EditorWindow
         {
             // Restart at the beginning of the animation clip
             timeElapsed = sliderAnimSpeed * (EditorApplication.timeSinceStartup - endTime);
-            _animationClip.SampleAnimation(_animator.gameObject, (float)timeElapsed);
+            animClipsMenu.animationClip.SampleAnimation(animatorsMenu.animator.gameObject, (float)timeElapsed);
 
             // Loop animation - Restarting chrono
-            if (timeElapsed >= _animationClip.length && animLoopBtn)
+            if (timeElapsed >= animClipsMenu.animationClip.length && animLoopBtn)
             {
                 endTime = EditorApplication.timeSinceStartup;
             }
 
             // Stoping the animation from playing 
-            if (timeElapsed >= _animationClip.length && !animLoopBtn)
+            if (timeElapsed >= animClipsMenu.animationClip.length && !animLoopBtn)
             {
                 timeElapsed = 0;
                 EditorApplication.update -= RestartAnimationClip;
@@ -422,26 +288,16 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    private static void ResetData()
+    static void ResetData()
     {
-        isPlaying = false;
-        isAnimatorSelected = false;
-        showAnimatorsDropDown = false;
-        showAnimClipsDropDown = false;
-
-        animClipLabel = "Select an animation clip";
-        animatorLabel = "Select an animator";
     }
 
     void CloseDropDown()
     {
-        for (int i = 0; i < dropDowns.Count; ++i)
+        foreach(var dd in dropdownMenus)
         {
-            if (dropDowns[i])
-            {
-                /*Debug.Log(i);*/
-                dropDowns[i] = false;
-            }
+            if (dd.showDropDown)
+                dd.showDropDown = false;
         }
     }
 
@@ -466,13 +322,6 @@ public class AnimationSimulatorWindow : EditorWindow
     static void OnSceneClosing()
     {
         isPlaying = false;
-        isAnimatorSelected = false;
-        showAnimatorsDropDown = false;
-        showAnimClipsDropDown = false;
-
-        animClipLabel = "Select an animation clip";
-        animatorLabel = "Select an animator";
-
         Selection.activeGameObject = null;
         /*EditorApplication.update -= PlayAnimationClip;*/
     }
@@ -495,8 +344,6 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void LogPlayModeState(PlayModeStateChange state)
     {
-        Debug.Log(state);
-
         OnSceneClosing();
     }
 }
