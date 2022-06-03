@@ -12,11 +12,17 @@ public abstract class DropDownMenu : EditorWindow
     public Rect rect = new Rect(100, 100, 250, 500);
     public Vector2 scrollPos = Vector2.zero;
 
-    public void DropDownButton()
-    {
+    public Animator[] animators;
+    public Animator animator;
+
+    public abstract void DropDownButton();
+  /*  {
+        *//*if (!animator)
+            return;
+
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-            showDropDown = !showDropDown;
-    }
+            showDropDown = !showDropDown;*//*
+    }*/
 
     public abstract void DrawDropDown();
 

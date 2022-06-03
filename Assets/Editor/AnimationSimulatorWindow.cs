@@ -50,6 +50,9 @@ public class AnimationSimulatorWindow : EditorWindow
     [MenuItem("Window/Animator Simulator")]
     private static void ShowWindow()
     {
+        if (Application.isPlaying)
+            return;
+      
         window = (AnimationSimulatorWindow)GetWindowWithRect(typeof(AnimationSimulatorWindow), new Rect(0, 0, 300, 300));
         window.Show();
     }
@@ -61,6 +64,9 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void OnGUI()
     {
+        if (Application.isPlaying)
+            this.Close();
+
         /*Instanciation des dropdown menus*/
         if (!animatorsMenu)
         {
@@ -110,18 +116,22 @@ public class AnimationSimulatorWindow : EditorWindow
             // Get more data when there's an animation clip selected
             if (animClipsMenu.animationClip)
             {
-                GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
-                sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
+                if (animClipsMenu.animator.runtimeAnimatorController)
+                {
 
-                GUILayout.Label($"Animation Starting Timestamp", EditorStyles.boldLabel);
-                sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
-                PrintAnimClipData();
+                    GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
+                    sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
 
-                animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
+                    GUILayout.Label($"Animation Starting Timestamp", EditorStyles.boldLabel);
+                    sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
+                    PrintAnimClipData();
 
-                RestartClipBtn();
-                PlayClipBtn();
-                StopClipBtn();
+                    animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
+
+                    RestartClipBtn();
+                    PlayClipBtn();
+                    StopClipBtn();
+                }
             }
         }
 
@@ -144,6 +154,9 @@ public class AnimationSimulatorWindow : EditorWindow
     void PrintAnimClipData()
     {
         if (!animClipsMenu.animationClip)
+            return;
+
+        if (!animClipsMenu.animator.runtimeAnimatorController)
             return;
 
         GUILayout.Label($"Current Animation Data", EditorStyles.boldLabel);

@@ -7,8 +7,6 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class DropDownAnimatorsMenu : DropDownMenu
 {
-    public Animator[] animators;
-    public Animator animator;
     DropDownAnimatorsMenu()
     {
         label = "Select an animator";
@@ -28,6 +26,15 @@ public class DropDownAnimatorsMenu : DropDownMenu
         }
 
         EndWindows();
+    }
+
+    public override void DropDownButton()
+    {
+        if (!animator)
+            return;
+
+        if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
+            showDropDown = !showDropDown;
     }
 
     public override void PopulateDropDown(int unusedWindowID)

@@ -6,8 +6,6 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class DropDownAnimClipsMenu : DropDownMenu
 {
-    public Animator[] animators;
-    public Animator animator;
     public AnimationClip animationClip;
 
     DropDownAnimClipsMenu()
@@ -17,6 +15,9 @@ public class DropDownAnimClipsMenu : DropDownMenu
   
     public override void DrawDropDown()
     {
+        if (!animator.runtimeAnimatorController)
+            return;
+
         BeginWindows();
         rect = GUILayout.Window(123, rect, PopulateDropDown, "");
 
@@ -31,9 +32,24 @@ public class DropDownAnimClipsMenu : DropDownMenu
         EndWindows();
     }
 
+    public override void DropDownButton()
+    {
+        if (!animator)
+            return;
+
+        if (!animator.runtimeAnimatorController)
+            return;
+
+        if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
+            showDropDown = !showDropDown;
+    }
+
     public override void PopulateDropDown(int unusedWindowID)
     {
         if (!animator)
+            return;
+
+        if (!animator.runtimeAnimatorController)
             return;
 
         EditorGUILayout.BeginVertical();
