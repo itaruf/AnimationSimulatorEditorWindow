@@ -53,6 +53,11 @@ public class AnimationSimulatorWindow : EditorWindow
         window.Show();
     }
 
+    private void OnEnable()
+    {
+        Selection.selectionChanged += Reset;
+    }
+
     private void Update()
     {
         Repaint();
@@ -297,8 +302,9 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    static void ResetData()
+    public void Reset()
     {
+        stopwatch.Reset();
     }
 
     // Get all animators from gameobjects in the scene
@@ -333,7 +339,6 @@ public class AnimationSimulatorWindow : EditorWindow
         /*animatorsMenu = null;*/
         animClipsMenu = null;
         animatorsMenu.animators = GetAnimatorsInScene();
-
     }
 
     static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
