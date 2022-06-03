@@ -167,7 +167,7 @@ public class AnimationSimulatorWindow : EditorWindow
             return;
 
         GUILayout.Label($"Current Animation Data", EditorStyles.boldLabel);
-        GUILayout.Label($"Animation total length : {animClipsMenu.animationClip.length}", EditorStyles.label);
+        GUILayout.Label($"Animation total length : {Math.Round(animClipsMenu.animationClip.length, 2)}", EditorStyles.label);
         GUILayout.Label($"Current Animation timestamp : {Math.Round(timeElapsed, 2)}", EditorStyles.label);
         GUILayout.Label($"Is animation set as Looping: {animClipsMenu.animationClip.isLooping}", EditorStyles.label);
     }
@@ -224,9 +224,7 @@ public class AnimationSimulatorWindow : EditorWindow
                 return;
 
             EditorApplication.update -= RestartAnimationClip;
-            /*EditorApplication.update -= PlayAnimationClip;*/
             isPaused = true;
-            /*isPlaying = false;*/
         }
     }
 
