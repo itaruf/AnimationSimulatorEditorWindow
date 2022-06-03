@@ -160,12 +160,14 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (GUILayout.Button("Restart"))
         {
-            isPaused = false;
-
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update += RestartAnimationClip;
+
+            sliderAnimTimestamp = 0;
+            isPaused = false;
             stopwatch.Restart();
+
             RestartAnimationClip();
         }
     }
@@ -177,12 +179,13 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (GUILayout.Button("Play"))
         {
-            isPaused = false;
-
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update += PlayAnimationClip;
+
+            isPaused = false;
             stopwatch.Start();
+
             PlayAnimationClip();
         }
     }
