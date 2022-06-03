@@ -24,9 +24,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
         if (Event.current.type == EventType.MouseDown)
         {
             if (!rect.Contains(Event.current.mousePosition))
-            {
                 showDropDown = false;
-            }
         }
 
         EndWindows();
@@ -41,7 +39,10 @@ public class DropDownAnimClipsMenu : DropDownMenu
             return;
 
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
+        {
             showDropDown = !showDropDown;
+            Selection.activeObject = animator.gameObject;
+        }
     }
 
     public override void PopulateDropDown(int unusedWindowID)

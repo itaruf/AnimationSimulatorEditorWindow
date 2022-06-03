@@ -102,7 +102,8 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
-        animatorsMenu.DropDownButton();
+        /*if (animatorsMenu)*/
+            animatorsMenu.DropDownButton();
 
         if (animatorsMenu.showDropDown)
             animatorsMenu.DrawDropDown();
@@ -123,14 +124,14 @@ public class AnimationSimulatorWindow : EditorWindow
                 if (animClipsMenu.animator.runtimeAnimatorController)
                 {
 
-                    GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
+                    GUILayout.Label($"[Preview] Current Animation Speed", EditorStyles.boldLabel);
                     sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
 
-                    GUILayout.Label($"Animation Starting Timestamp", EditorStyles.boldLabel);
+                    GUILayout.Label($"[Preview] Animation Starting Timestamp", EditorStyles.boldLabel);
                     sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
                     PrintAnimClipData();
 
-                    animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
+                    animLoopBtn = EditorGUILayout.Toggle("[Preview] Loop Animation", animLoopBtn);
 
                     RestartClipBtn();
                     PlayClipBtn();
@@ -334,8 +335,10 @@ public class AnimationSimulatorWindow : EditorWindow
     {
         UnityEngine.Debug.Log("SceneOpened");
         Selection.activeGameObject = null;
-        animatorsMenu = null;
+        /*animatorsMenu = null;*/
         animClipsMenu = null;
+        animatorsMenu.animators = GetAnimatorsInScene();
+
     }
 
     static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
