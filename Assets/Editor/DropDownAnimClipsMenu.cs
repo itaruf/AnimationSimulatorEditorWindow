@@ -72,7 +72,30 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
     public override void Reset()
     {
-        label = "Select an animation";
-        animationClip = null;
+        if (Selection.activeGameObject)
+        {
+            if (Selection.activeGameObject.TryGetComponent(out animator))
+            {
+                if (!animator.runtimeAnimatorController)
+                {
+                    animationClip = null;
+                    label = "Select an animation";
+                    Debug.Log(2);
+                    return;
+                }
+                animationClip = animator.runtimeAnimatorController.animationClips[0];
+                label = animationClip.name;
+                Selection.activeGameObject = animator.gameObject;
+                Debug.Log(3);
+                return;
+            }
+            else
+            {
+                animationClip = null;
+                label = "Select an animation";
+                Debug.Log(4);
+                return;
+            }
+        }
     }
 }
