@@ -83,23 +83,12 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (Selection.activeGameObject)
         {
-            if (!Selection.activeGameObject.TryGetComponent(out animatorsMenu.animator))
-            {
-                ResetData();
-            }
-            else
+            if (Selection.activeGameObject.TryGetComponent(out animatorsMenu.animator))
             {
                 animClipsMenu.animator = animatorsMenu.animator;
                 animatorsMenu.label = animatorsMenu.animator.gameObject.name + " " + animatorsMenu.animator.gameObject.GetInstanceID().ToString();
                 Selection.activeGameObject = animatorsMenu.animator.gameObject;
             }
-        }
-
-        else
-        {
-            isPlaying = false;
-            EditorApplication.update -= RestartAnimationClip;
-            EditorApplication.update -= PlayAnimationClip;
         }
 
         animatorsMenu.DropDownButton();
@@ -111,9 +100,11 @@ public class AnimationSimulatorWindow : EditorWindow
         {
             animClipsMenu.DropDownButton();
 
+            // Print the animation clips list only if we click on the drop down button
             if (animClipsMenu.showDropDown)
                 animClipsMenu.DrawDropDown();
 
+            // Get more data when there's an animation clip selected
             if (animClipsMenu.animationClip)
             {
                 GUILayout.Label($"Current Animation Speed", EditorStyles.boldLabel);
@@ -131,8 +122,19 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
+        SetFocusBackToGameObject();
+
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
+    }
+
+    private static void SetFocusBackToGameObject()
+    {
+        if (Event.current.type == EventType.MouseDown)
+        {
+            if (animatorsMenu.animator)
+                Selection.activeGameObject = animatorsMenu.animator.gameObject;
+        }
     }
 
     void PrintAnimClipData()

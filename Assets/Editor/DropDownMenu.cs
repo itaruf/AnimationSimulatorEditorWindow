@@ -15,12 +15,7 @@ public abstract class DropDownMenu : EditorWindow
     public void DropDownButton()
     {
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-        {
-            if (showDropDown)
-                showDropDown = false;
-            else
-                showDropDown = true;
-        }
+            showDropDown = !showDropDown;
     }
 
     public abstract void DrawDropDown();
