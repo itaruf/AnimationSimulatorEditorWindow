@@ -61,10 +61,6 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void OnGUI()
     {
-        /*zeit.Start();
-        UnityEngine.Debug.Log(zeit.Elapsed);*/
-
-
         /*Instanciation des dropdown menus*/
         if (!animatorsMenu)
         {
@@ -186,6 +182,7 @@ public class AnimationSimulatorWindow : EditorWindow
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update -= RestartAnimationClip;
             EditorApplication.update += PlayAnimationClip;
+            stopwatch.Start();
             PlayAnimationClip();
         }
     }
@@ -223,27 +220,20 @@ public class AnimationSimulatorWindow : EditorWindow
         // The animation is now playing
         if (!isPlaying && !isPaused)
         {
-            endTime = EditorApplication.timeSinceStartup;
             isPlaying = true;
             pauseTime = 0;
-        }
-
-        if (isPaused)
-        {
-            pauseTime = EditorApplication.timeSinceStartup;
-            startTime -= pauseTime - endTime;
         }
 
         else
         {
             // Play the animation at a specific timestamp
-            timeElapsed = sliderAnimSpeed * (startTime - endTime);
+            timeElapsed = sliderAnimSpeed * (stopwatch.Elapsed.TotalSeconds + sliderAnimTimestamp);
             animClipsMenu.animationClip.SampleAnimation(animatorsMenu.animator.gameObject, (float)timeElapsed);
 
             // Loop animation - Restarting chrono
             if (timeElapsed >= animClipsMenu.animationClip.length && animLoopBtn)
             {
-                endTime = EditorApplication.timeSinceStartup;
+                stopwatch.Restart();
             }
 
             // Stoping the animation from playing 
@@ -252,12 +242,9 @@ public class AnimationSimulatorWindow : EditorWindow
                 timeElapsed = 0;
                 EditorApplication.update -= PlayAnimationClip;
                 isPlaying = false;
+                stopwatch.Reset();
+                stopwatch.Stop();
             }
-        }
-
-        if (isPlaying)
-        {
-            startTime = EditorApplication.timeSinceStartup;
         }
     }
 
