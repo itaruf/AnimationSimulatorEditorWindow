@@ -40,7 +40,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
         {
             showDropDown = !showDropDown;
-            Selection.activeObject = animator.gameObject;
+            /*Selection.activeObject = animator.gameObject;*/
         }
     }
 
@@ -82,7 +82,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
             {
                 if (!animator.runtimeAnimatorController)
                 {
-                    animationClip = null;
+                    /*animationClip = null;*/
                     label = "Select an animation";
                     return;
                 }
@@ -91,12 +91,13 @@ public class DropDownAnimClipsMenu : DropDownMenu
                 Selection.activeGameObject = animator.gameObject;
                 return;
             }
-            else
+           /* else
             {
-                animationClip = null;
+                Debug.Log("HERE");
+                *//*animationClip = null;*//*
                 label = "Select an animation";
                 return;
-            }
+            }*/
         }
         CloseDropDown();
     }

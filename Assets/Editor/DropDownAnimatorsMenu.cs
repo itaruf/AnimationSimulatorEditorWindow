@@ -30,11 +30,11 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
     public override void DropDownButton()
     {
-        if (Selection.activeGameObject)
+        /*if (Selection.activeGameObject)
         {
             if (!Selection.activeGameObject.GetComponent<Animator>())
                 label = "Select an animator";
-        }
+        }*/
 
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
                 showDropDown = !showDropDown;

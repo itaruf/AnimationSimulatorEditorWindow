@@ -55,7 +55,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     private void OnEnable()
     {
-        Selection.selectionChanged += Reset;
+        /*Selection.selectionChanged += Reset;*/
     }
 
     private void Update()
@@ -82,7 +82,7 @@ public class AnimationSimulatorWindow : EditorWindow
             animClipsMenu = CreateInstance<DropDownAnimClipsMenu>();
             if (!dropdownMenus.Contains(animClipsMenu))
                 dropdownMenus.Add(animClipsMenu);
-            animatorsMenu.onAnimatorChange += animClipsMenu.Reset;
+            /*animatorsMenu.onAnimatorChange += animClipsMenu.Reset;*/
             Selection.selectionChanged += animClipsMenu.Reset;
             Selection.selectionChanged += animClipsMenu.CloseDropDown;
         }
@@ -97,8 +97,11 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (Selection.activeGameObject)
         {
-            if (Selection.activeGameObject.TryGetComponent(out animatorsMenu.animator))
+            if (Selection.activeGameObject.GetComponent<Animator>())
             {
+                /* if (Selection.activeGameObject.TryGetComponent(out animatorsMenu.animator))
+                 {*/
+                animatorsMenu.animator = Selection.activeGameObject.GetComponent<Animator>();
                 animatorsMenu.label = animatorsMenu.animator.gameObject.name + " " + animatorsMenu.animator.gameObject.GetInstanceID().ToString();
                 Selection.activeGameObject = animatorsMenu.animator.gameObject;
             }
@@ -112,6 +115,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (animatorsMenu.animator)
         {
+            UnityEngine.Debug.Log(1);
+
             animClipsMenu.animator = animatorsMenu.animator;
 
             animClipsMenu.DropDownButton();
@@ -125,6 +130,7 @@ public class AnimationSimulatorWindow : EditorWindow
             {
                 if (animClipsMenu.animator.runtimeAnimatorController)
                 {
+                    UnityEngine.Debug.Log("IF");
 
                     GUILayout.Label($"[Preview] Current Animation Speed", EditorStyles.boldLabel);
                     sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
@@ -166,6 +172,7 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animator.runtimeAnimatorController)
             return;
 
+        UnityEngine.Debug.Log("CAN PRINT");
         GUILayout.Label($"Current Animation Data", EditorStyles.boldLabel);
         GUILayout.Label($"Animation total length : {Math.Round(animClipsMenu.animationClip.length, 2)}", EditorStyles.label);
         GUILayout.Label($"Current Animation timestamp : {Math.Round(timeElapsed, 2)}", EditorStyles.label);
