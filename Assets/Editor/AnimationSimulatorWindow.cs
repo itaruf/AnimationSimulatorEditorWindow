@@ -16,12 +16,12 @@ public class AnimationSimulatorWindow : EditorWindow
     public Animator animator = new Animator();
     static bool isPlaying = false;
     static bool isPaused = false;
-    double timeElapsed;
+    static double timeElapsed;
 
     static float sliderAnimSpeed = 1.0f;
     static float sliderAnimTimestamp = 1.0f;
 
-    bool animLoopBtn = true;
+    static bool animLoopBtn = true;
 
     // Scrollbar
     Vector2 scrollPos = Vector2.zero;
@@ -32,7 +32,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     List<DropDownMenu> dropdownMenus = new List<DropDownMenu>();
 
-    public Stopwatch stopwatch = new Stopwatch();
+    public static Stopwatch stopwatch = new Stopwatch();
 
     static EditorApplication.HierarchyWindowItemCallback hierarchyItemCallback;
 
@@ -70,7 +70,7 @@ public class AnimationSimulatorWindow : EditorWindow
     }
 
     [MenuItem("Window/Animator Simulator")]
-    private static void ShowWindow()
+    static void ShowWindow()
     {
         if (Application.isPlaying)
             return;
@@ -79,12 +79,12 @@ public class AnimationSimulatorWindow : EditorWindow
         window.Show();
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
         Selection.selectionChanged += Reset;
     }
 
-    private void Update()
+    void Update()
     {
         Repaint();
     }
@@ -177,7 +177,7 @@ public class AnimationSimulatorWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
-    private static void SetFocusBackToGameObject()
+    static void SetFocusBackToGameObject()
     {
         if (Event.current.type == EventType.MouseDown)
         {
@@ -308,7 +308,7 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    private void PlayAnimationClip()
+    static void PlayAnimationClip()
     {
         if (!animatorsMenu.animator)
             return;
@@ -348,7 +348,7 @@ public class AnimationSimulatorWindow : EditorWindow
     }
 
     /*RESTART*/
-    private void RestartAnimationClip()
+    static void RestartAnimationClip()
     {
         if (!animatorsMenu.animator)
             return;
@@ -382,8 +382,9 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    public void Reset()
+    static void Reset()
     {
+        EditorApplication.update -= RestartAnimationClip;
         EditorApplication.update -= PlayAnimationClip;
         sliderAnimSpeed = 1;
         sliderAnimTimestamp = 0;
@@ -412,14 +413,10 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void OnSceneClosing()
     {
-        isPlaying = false;
-        isPaused = false;
-        sliderAnimSpeed = 1;
-        sliderAnimTimestamp = 0;
+        Reset();
         Selection.activeGameObject = null;
         animatorsMenu.Reset();
         animClipsMenu.Reset();
-        /*EditorApplication.update -= PlayAnimationClip;*/
     }
 
     static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
