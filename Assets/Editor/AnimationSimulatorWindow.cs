@@ -271,8 +271,8 @@ public class AnimationSimulatorWindow : EditorWindow
     static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
         UnityEngine.Debug.Log("SceneOpened");
-        // Find all animators in the scene
 
+        // Find all animators in the scene
         if (!animatorsMenu)
             animatorsMenu.animators = GetAnimatorsInScene();
 

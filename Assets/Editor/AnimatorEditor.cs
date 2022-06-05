@@ -26,6 +26,9 @@ public class AnimatorEditor : EditorWindow
         if (!animator.runtimeAnimatorController)
             return;
 
+        if (animator.runtimeAnimatorController.animationClips == null)
+            return;
+
         if (animator.runtimeAnimatorController.animationClips.Length <= 0)
             return;
 
@@ -216,7 +219,6 @@ public class AnimatorEditor : EditorWindow
 
         if (isPaused)
             return;
-
 
         // Restart at the beginning of the animation clip
         timeElapsed = sliderAnimSpeed * stopwatch.Elapsed.TotalSeconds;
