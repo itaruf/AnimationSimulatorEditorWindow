@@ -9,7 +9,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
     DropDownAnimClipsMenu()
     {
         label = "Select an animation";
-        rect = new Rect(0, 80, 200, 200);
+        rect = new Rect(0, 80, 300, 300);
     }
 
     public override void DropDownButton()
@@ -34,7 +34,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
         onOpeningDropDown?.Invoke();
 
         BeginWindows();
-        rect = GUILayout.Window(123, rect, PopulateDropDown, "");
+        rect = GUILayout.Window(1, rect, PopulateDropDown, "");
 
         if (Event.current.type == EventType.MouseDown)
         {

@@ -72,19 +72,24 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animatorsMenu)
         {
             animatorsMenu = CreateInstance<DropDownAnimatorsMenu>();
+
             if (!dropdownMenus.Contains(animatorsMenu))
                 dropdownMenus.Add(animatorsMenu);
+
             Selection.selectionChanged += animatorsMenu.CloseDropDown;
         }
 
         if (!animClipsMenu)
         {
             animClipsMenu = CreateInstance<DropDownAnimClipsMenu>();
+
             if (!dropdownMenus.Contains(animClipsMenu))
                 dropdownMenus.Add(animClipsMenu);
             /*animatorsMenu.onAnimatorChange += animClipsMenu.Reset;*/
+
             Selection.selectionChanged += animClipsMenu.Reset;
             Selection.selectionChanged += animClipsMenu.CloseDropDown;
+
             animatorsMenu.onOpeningDropDown += animClipsMenu.CloseDropDown;
             animClipsMenu.onOpeningDropDown += animatorsMenu.CloseDropDown;
         }
@@ -92,6 +97,9 @@ public class AnimationSimulatorWindow : EditorWindow
         // Find all animators in the scene
         animatorsMenu.animators = GetAnimatorsInScene();
 
+        /*Drawings*/
+
+        // Scrollbar
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, false);
 
@@ -109,18 +117,13 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
-        /*if (animatorsMenu)*/
-            animatorsMenu.DropDownButton();
+        animatorsMenu.DropDownButton();
 
-
-        if (animatorsMenu.animator)
+        animClipsMenu.animator = animatorsMenu.animator;
+        animClipsMenu.DropDownButton();
+        
+        if (!animClipsMenu.showDropDown && !animatorsMenu.showDropDown)
         {
-            animClipsMenu.animator = animatorsMenu.animator;
-
-            animClipsMenu.DropDownButton();
-
-            // Print the animation clips list only if we click on the drop down button
-
             // Get more data when there's an animation clip selected
             if (animClipsMenu.animationClip)
             {
@@ -141,6 +144,7 @@ public class AnimationSimulatorWindow : EditorWindow
                 }
             }
         }
+
 
         if (animatorsMenu.showDropDown)
             animatorsMenu.DrawDropDown();

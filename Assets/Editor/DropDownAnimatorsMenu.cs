@@ -12,7 +12,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
     DropDownAnimatorsMenu()
     {
         label = "Select an animator";
-        rect = new Rect(0, 60, 200, 200);
+        rect = new Rect(0, 60, 300, 300);
     }
 
     public override void DropDownButton()
@@ -34,7 +34,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
         onOpeningDropDown?.Invoke();
 
         BeginWindows();
-        rect = GUILayout.Window(200, rect, PopulateDropDown, "");
+        rect = GUILayout.Window(1, rect, PopulateDropDown, "");
 
         if (Event.current.type == EventType.MouseDown)
         {
@@ -56,10 +56,10 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
             if (GUILayout.Button(a.name))
             {
+                CloseDropDown();
+
                 if (animator == a)
                     return;
-
-                CloseDropDown();
 
                 Selection.activeObject = a.gameObject;
                 animator = a;
