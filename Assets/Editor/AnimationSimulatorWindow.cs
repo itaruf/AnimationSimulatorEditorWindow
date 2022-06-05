@@ -110,8 +110,6 @@ public class AnimationSimulatorWindow : EditorWindow
         /*if (animatorsMenu)*/
             animatorsMenu.DropDownButton();
 
-        if (animatorsMenu.showDropDown)
-            animatorsMenu.DrawDropDown();
 
         if (animatorsMenu.animator)
         {
@@ -120,8 +118,6 @@ public class AnimationSimulatorWindow : EditorWindow
             animClipsMenu.DropDownButton();
 
             // Print the animation clips list only if we click on the drop down button
-            if (animClipsMenu.showDropDown)
-                animClipsMenu.DrawDropDown();
 
             // Get more data when there's an animation clip selected
             if (animClipsMenu.animationClip)
@@ -143,6 +139,12 @@ public class AnimationSimulatorWindow : EditorWindow
                 }
             }
         }
+
+        if (animatorsMenu.showDropDown)
+            animatorsMenu.DrawDropDown();
+
+        if (animatorsMenu.animator && animClipsMenu.showDropDown)
+            animClipsMenu.DrawDropDown();
 
         // If an animator was selected, make sure to retarget its gameobject when going back in the anim window
         SetFocusBackToGameObject();
@@ -193,7 +195,6 @@ public class AnimationSimulatorWindow : EditorWindow
             RestartAnimationClip();
         }
     }
-
     void PlayClipBtn()
     {
         if (!animClipsMenu.animationClip)
