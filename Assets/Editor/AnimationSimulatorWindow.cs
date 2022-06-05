@@ -14,15 +14,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     // Animation Data
     public static Animator animator = new Animator();
-    static bool isPlaying = false;
-    static bool isPaused = false;
-    static double timeElapsed;
-
-    static float sliderAnimSpeed = 1.0f;
-    static float sliderAnimTimestamp = 1.0f;
-
-    static bool animLoopBtn = true;
-
+   
     // Scrollbar
     Vector2 scrollPos = Vector2.zero;
 
@@ -36,6 +28,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static EditorApplication.HierarchyWindowItemCallback hierarchyItemCallback;
 
+    static List<AnimatorEditor> animatorEditors = new List<AnimatorEditor>();
 
     // Subscribing to events
     static AnimationSimulatorWindow()
@@ -87,12 +80,13 @@ public class AnimationSimulatorWindow : EditorWindow
     void Update()
     {
         Repaint();
+        GetAnimatorsInScene();
     }
 
     void OnGUI()
     {
         if (Application.isPlaying)
-            this.Close();
+            Close();
 
         /*********DropDown Menus instanciation*********/
         if (!animatorsMenu)
@@ -128,8 +122,6 @@ public class AnimationSimulatorWindow : EditorWindow
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, false);
 
-        /*EditorGUILayout.LabelField($"Animators in the scene : {animatorsMenu.animators.Length}", EditorStyles.boldLabel);*/
-
         if (Selection.activeGameObject)
         {
             if (Selection.activeGameObject.GetComponent<Animator>())
@@ -156,11 +148,20 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animator.runtimeAnimatorController)
             goto exit;
 
-        PrintAnimClipData();
-
-        RestartClipBtn();
-        PlayClipBtn();
-        StopClipBtn();
+        foreach (var a in animatorEditors)
+        {
+            if (a.animator.gameObject.GetInstanceID() == Selection.activeInstanceID)
+            {
+                if (animatorsMenu.animator.gameObject.GetInstanceID() == a.animator.gameObject.GetInstanceID())
+                {
+                    a.animationClip = animClipsMenu.animationClip;
+                    a.PrintAnimClipData();
+                    a.PlayClipBtn();
+                    a.StopClipBtn();
+                    a.RestartAnimationClip();
+                }
+            }
+        }
 
         exit:
 
@@ -186,215 +187,26 @@ public class AnimationSimulatorWindow : EditorWindow
         }
     }
 
-    void PrintAnimClipData()
-    {
-        if (!animClipsMenu.animationClip)
-            return;
 
-        if (!animClipsMenu.animator.runtimeAnimatorController)
-            return;
-
-        EditorGUILayout.Space();
-
-        EditorGUILayout.LabelField($"[Preview]", EditorStyles.boldLabel);
-
-        EditorGUILayout.LabelField($"Animation Speed", EditorStyles.label);
-        sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
-
-        EditorGUILayout.LabelField($"Animation Starting Timestamp", EditorStyles.label);
-        sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
-
-        EditorGUILayout.LabelField($"Animation timestamp : {Math.Round(timeElapsed, 2)}", EditorStyles.label);
-
-        animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
-
-        EditorGUILayout.Space();
-
-        EditorGUILayout.LabelField($"[Animation Data]", EditorStyles.boldLabel);
-
-        EditorGUILayout.LabelField($"Animation total length : {Math.Round(animClipsMenu.animationClip.length, 2)}", EditorStyles.label);
-        EditorGUILayout.LabelField($"Is animation set as looping : {animClipsMenu.animationClip.isLooping}", EditorStyles.label);
-
-        EditorGUILayout.Space();
-    }
-
-    // Restart Button to restart the current animation clip
-    void RestartClipBtn()
-    {
-        if (!animClipsMenu.animationClip)
-            return;
-
-        if (GUILayout.Button("Restart"))
-        {
-            EditorApplication.update -= RestartAnimationClip;
-            EditorApplication.update -= PlayAnimationClip;
-            EditorApplication.update += RestartAnimationClip;
-
-            sliderAnimTimestamp = 0;
-            isPaused = false;
-            stopwatch.Restart();
-
-            RestartAnimationClip();
-        }
-    }
-    void PlayClipBtn()
-    {
-        if (!animClipsMenu.animationClip)
-            return;
-
-        bool btn = false;
-        GUIStyle buttonStyle;
-
-        if (!isPlaying)
-        {
-            GUI.backgroundColor = new Color(1, 1, 1);
-            buttonStyle = new GUIStyle(GUI.skin.button);
-            btn = GUILayout.Button("Play", buttonStyle);
-        }
-
-        else
-        {
-            GUI.backgroundColor = Color.red;
-            buttonStyle = new GUIStyle(GUI.skin.button);
-            btn = GUILayout.Button("Play", buttonStyle);
-        }
-
-        if (btn)
-        {
-            EditorApplication.update -= PlayAnimationClip;
-            EditorApplication.update -= RestartAnimationClip;
-            EditorApplication.update += PlayAnimationClip;
-
-            isPaused = false;
-            stopwatch.Start();
-
-            PlayAnimationClip();
-        }
-    }
-
-    void StopClipBtn()
-    {
-        if (!animClipsMenu.animationClip)
-            return;
-
-        bool btn = false;
-        GUIStyle buttonStyle;
-
-        if (!isPaused)
-        {
-            GUI.backgroundColor = new Color(1, 1, 1);
-            buttonStyle = new GUIStyle(GUI.skin.button);
-            btn = GUILayout.Button("Stop", buttonStyle);
-        }
-
-        else
-        {
-            GUI.backgroundColor = Color.yellow;
-            buttonStyle = new GUIStyle(GUI.skin.button);
-            btn = GUILayout.Button("Stop", buttonStyle);
-        }
-
-        if (btn)
-        {
-            if (!isPlaying)
-                return;
-
-            if (isPaused)
-                return;
-
-            EditorApplication.update -= RestartAnimationClip;
-            isPaused = true;
-            isPlaying = false;
-        }
-    }
-
-    static void PlayAnimationClip()
-    {
-        if (!animatorsMenu.animator)
-            return;
-
-        if (!animClipsMenu.animationClip)
-            return;
-
-        // The animation is now playing
-        if (!isPlaying && !isPaused)
-            isPlaying = true;
-
-        else
-        {
-            if (isPaused)
-                stopwatch.Stop();
-
-            // Play the animation at a specific timestamp
-            timeElapsed = sliderAnimSpeed * (stopwatch.Elapsed.TotalSeconds + sliderAnimTimestamp);
-            animClipsMenu.animationClip.SampleAnimation(animatorsMenu.animator.gameObject, (float)timeElapsed);
-
-            // Loop animation - Restarting chrono
-            if (timeElapsed >= animClipsMenu.animationClip.length && animLoopBtn)
-            {
-                stopwatch.Restart();
-            }
-
-            // Stoping the animation from playing 
-            if (timeElapsed >= animClipsMenu.animationClip.length && !animLoopBtn)
-            {
-                timeElapsed = 0;
-                EditorApplication.update -= PlayAnimationClip;
-                isPlaying = false;
-                stopwatch.Reset();
-                stopwatch.Stop();
-            }
-        }
-    }
-
-    /*RESTART*/
-    static void RestartAnimationClip()
-    {
-        if (!animatorsMenu.animator)
-            return;
-
-        if (!animClipsMenu.animationClip)
-            return;
-
-        // The animation is now playing
-        if (!isPlaying)
-            isPlaying = true;
-
-        if (!isPaused)
-        {
-            // Restart at the beginning of the animation clip
-            timeElapsed = sliderAnimSpeed * stopwatch.Elapsed.TotalSeconds;
-            animClipsMenu.animationClip.SampleAnimation(animatorsMenu.animator.gameObject, (float)timeElapsed);
-
-            // Loop animation - Restarting chrono
-            if (timeElapsed >= animClipsMenu.animationClip.length && animLoopBtn)
-                stopwatch.Restart();
-
-            // Stoping the animation from playing 
-            if (timeElapsed >= animClipsMenu.animationClip.length && !animLoopBtn)
-            {
-                timeElapsed = 0;
-                EditorApplication.update -= RestartAnimationClip;
-                isPlaying = false;
-                stopwatch.Reset();
-                stopwatch.Stop();
-            }
-        }
-    }
-
+   
     static void Reset()
     {
-        bool result = Selection.activeGameObject.TryGetComponent(out animator);
-        if (!result || (result && !animator.runtimeAnimatorController))
+       /* bool result = false;
+        if (Selection.activeGameObject)
+            result = Selection.activeGameObject.TryGetComponent(out animator);
+        else
+            return;
+
+        if (result && !animator.runtimeAnimatorController)
         {
-            EditorApplication.update -= RestartAnimationClip;
-            EditorApplication.update -= PlayAnimationClip;
-            sliderAnimSpeed = 1;
+            *//*EditorApplication.update -= RestartAnimationClip;
+            EditorApplication.update -= PlayAnimationClip;*/
+            /*sliderAnimSpeed = 1;
             sliderAnimTimestamp = 0;
             stopwatch.Reset();
             isPlaying = false;
-            isPaused = false;
-        }
+            isPaused = false;*//*
+        }*/
     }
 
     // Get all animators from gameobjects in the scene
@@ -412,12 +224,36 @@ public class AnimationSimulatorWindow : EditorWindow
             AnimatorList.AddRange(rootGameObject.GetComponentsInChildren<Animator>(true));
         }
 
+        foreach (var a in AnimatorList)
+        {
+            bool exist = false;
+            foreach (var aE in animatorEditors)
+            {
+                if (aE.animator == a)
+                {
+                    exist = true;
+                    break;
+                }
+            }
+
+            if (!exist)
+                animatorEditors.Add(new AnimatorEditor(a));
+        }
+
+        /*UnityEngine.Debug.Log(animatorEditors.Count);*/
+
         return AnimatorList.ToArray();
     }
 
     static void OnSceneClosing()
     {
-        Reset();
+        /*EditorApplication.update -= RestartAnimationClip;
+        EditorApplication.update -= PlayAnimationClip;*/
+      /*  sliderAnimSpeed = 1;
+        sliderAnimTimestamp = 0;
+        stopwatch.Reset();
+        isPlaying = false;
+        isPaused = false;*/
         Selection.activeGameObject = null;
         animatorsMenu.Reset();
         animClipsMenu.Reset();
