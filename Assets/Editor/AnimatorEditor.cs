@@ -200,7 +200,6 @@ public class AnimatorEditor : EditorWindow
 
     public void PrintAnimClipData()
     {
-
         if (!animator.runtimeAnimatorController)
             return;
 

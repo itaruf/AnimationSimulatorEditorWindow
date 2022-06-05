@@ -21,7 +21,7 @@ public class AnimationSimulatorWindow : EditorWindow
     // Menus
     static DropDownAnimatorsMenu animatorsMenu;
     static DropDownAnimClipsMenu animClipsMenu;
-
+    AnimatorEditor animatorEdit;
     List<DropDownMenu> dropdownMenus = new List<DropDownMenu>();
 
     public static Stopwatch stopwatch = new Stopwatch();
@@ -154,17 +154,22 @@ public class AnimationSimulatorWindow : EditorWindow
             {
                 if (animatorsMenu.animator.gameObject.GetInstanceID() == a.animator.gameObject.GetInstanceID())
                 {
+                    animatorEdit = a;
                     a.animationClip = animClipsMenu.animationClip;
-                    a.PrintAnimClipData();
-                    a.PlayClipBtn();
-                    a.StopClipBtn();
-                    a.RestartClipBtn();
                 }
             }
         }
 
-        exit:
+        if (animatorEdit)
+        {
+            animatorEdit.PrintAnimClipData();
+            animatorEdit.PrintAnimClipData();
+            animatorEdit.PlayClipBtn();
+            animatorEdit.StopClipBtn();
+            animatorEdit.RestartClipBtn();
+        }
 
+        exit:
         if (animatorsMenu.showDropDown)
             animatorsMenu.DrawDropDown();
 
