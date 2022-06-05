@@ -313,6 +313,8 @@ public class AnimationSimulatorWindow : EditorWindow
 
     public void Reset()
     {
+        sliderAnimSpeed = 1;
+        sliderAnimTimestamp = 0;
         stopwatch.Reset();
     }
 
