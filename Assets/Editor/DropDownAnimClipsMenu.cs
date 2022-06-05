@@ -12,6 +12,20 @@ public class DropDownAnimClipsMenu : DropDownMenu
         rect = new Rect(0, 80, 200, 200);
     }
 
+    public override void DropDownButton()
+    {
+        if (!animator)
+            return;
+
+        if (!animator.runtimeAnimatorController)
+            return;
+
+        if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
+            showDropDown = !showDropDown;
+
+        SearchField();
+    }
+
     public override void DrawDropDown()
     {
         if (!animator.runtimeAnimatorController)
@@ -29,20 +43,6 @@ public class DropDownAnimClipsMenu : DropDownMenu
         }
 
         EndWindows();
-    }
-
-    public override void DropDownButton()
-    {
-        if (!animator)
-            return;
-
-        if (!animator.runtimeAnimatorController)
-            return;
-
-        if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-            showDropDown = !showDropDown;
-
-        SearchField();
     }
 
     public override void PopulateDropDown(int unusedWindowID)

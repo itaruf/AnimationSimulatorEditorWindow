@@ -15,6 +15,20 @@ public class DropDownAnimatorsMenu : DropDownMenu
         rect = new Rect(0, 60, 200, 200);
     }
 
+    public override void DropDownButton()
+    {
+        /*if (Selection.activeGameObject)
+        {
+            if (!Selection.activeGameObject.GetComponent<Animator>())
+                label = "Select an animator";
+        }*/
+
+        if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
+                showDropDown = !showDropDown;
+        SearchField();
+
+    }
+
     public override void DrawDropDown()
     {
         onOpeningDropDown?.Invoke();
@@ -28,20 +42,6 @@ public class DropDownAnimatorsMenu : DropDownMenu
                 showDropDown = false;
         }
         EndWindows();
-    }
-
-    public override void DropDownButton()
-    {
-        /*if (Selection.activeGameObject)
-        {
-            if (!Selection.activeGameObject.GetComponent<Animator>())
-                label = "Select an animator";
-        }*/
-
-        if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-                showDropDown = !showDropDown;
-        SearchField();
-
     }
 
     public override void PopulateDropDown(int unusedWindowID)
