@@ -251,11 +251,8 @@ public class AnimationSimulatorWindow : EditorWindow
             {
                 var aE = new AnimatorEditor(a);
                 animatorEditors.Add(aE);
-                /*EditorSceneManager.sceneClosing += aE.OnClosing;*/
             }
         }
-
-        /*UnityEngine.Debug.Log(animatorEditors.Count);*/
 
         return AnimatorList.ToArray();
     }
@@ -263,17 +260,26 @@ public class AnimationSimulatorWindow : EditorWindow
     static void OnSceneClosing()
     {
         Selection.activeGameObject = null;
-        animatorsMenu.Reset();
-        animClipsMenu.Reset();
+
+        if (animatorsMenu)
+            animatorsMenu.Reset();
+
+        if (animClipsMenu)
+            animClipsMenu.Reset();
     }
 
     static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
         UnityEngine.Debug.Log("SceneOpened");
         // Find all animators in the scene
-        animatorsMenu.animators = GetAnimatorsInScene();
+
+        if (!animatorsMenu)
+            animatorsMenu.animators = GetAnimatorsInScene();
+
         Selection.activeGameObject = null;
-        animatorEditors.Clear();
+
+        if (animatorEditors != null)
+            animatorEditors.Clear();
     }
 
     static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)

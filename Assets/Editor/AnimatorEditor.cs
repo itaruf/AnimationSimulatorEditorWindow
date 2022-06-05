@@ -243,7 +243,8 @@ public class AnimatorEditor : EditorWindow
 
         if (!animationClip)
         {
-            /*animationClip = animator.runtimeAnimatorController.animationClips[0];*/
+            if (animator.runtimeAnimatorController.animationClips != null)
+                animationClip = animator.runtimeAnimatorController.animationClips[0];
             return;
         }
 
