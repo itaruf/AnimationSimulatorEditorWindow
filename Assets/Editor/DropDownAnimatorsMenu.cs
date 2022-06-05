@@ -12,7 +12,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
     DropDownAnimatorsMenu()
     {
         label = "Select an animator";
-        rect = new Rect(0, 55, 200, 200);
+        rect = new Rect(0, 60, 200, 200);
     }
 
     public override void DrawDropDown()
@@ -44,6 +44,9 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
     public override void PopulateDropDown(int unusedWindowID)
     {
+        EditorGUILayout.BeginVertical();
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, true);
+
         foreach (var a in animators)
         {
             if (!a.name.ToUpper().Contains(strResult.ToUpper()) && searchField.HasFocus())
@@ -63,6 +66,9 @@ public class DropDownAnimatorsMenu : DropDownMenu
                 onAnimatorChange?.Invoke();
             }
         }
+
+        EditorGUILayout.EndScrollView();
+        EditorGUILayout.EndVertical();
     }
 
     public override void Reset()

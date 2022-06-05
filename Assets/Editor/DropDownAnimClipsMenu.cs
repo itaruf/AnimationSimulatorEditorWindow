@@ -9,7 +9,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
     DropDownAnimClipsMenu()
     {
         label = "Select an animation";
-        rect = new Rect(0, 75, 200, 200);
+        rect = new Rect(0, 80, 200, 200);
     }
 
     public override void DrawDropDown()
@@ -69,6 +69,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
                 animationClip = a;
             }
         }
+
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
     }
