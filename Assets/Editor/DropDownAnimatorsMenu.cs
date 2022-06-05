@@ -17,6 +17,8 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
     public override void DrawDropDown()
     {
+        onOpeningDropDown?.Invoke();
+
         BeginWindows();
         rect = GUILayout.Window(200, rect, PopulateDropDown, "");
 

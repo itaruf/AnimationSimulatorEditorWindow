@@ -16,10 +16,13 @@ public abstract class DropDownMenu : EditorWindow
     public SearchField searchField;
     public string strResult = " ";
 
-   /* private void OnEnable()
-    {
-        EditorApplication.update += SearchField;
-    }*/
+    public delegate void OnOpeningDropDown();
+    public OnOpeningDropDown onOpeningDropDown;
+
+    /* private void OnEnable()
+     {
+         EditorApplication.update += SearchField;
+     }*/
 
     public abstract void DropDownButton();
 

@@ -85,6 +85,8 @@ public class AnimationSimulatorWindow : EditorWindow
             /*animatorsMenu.onAnimatorChange += animClipsMenu.Reset;*/
             Selection.selectionChanged += animClipsMenu.Reset;
             Selection.selectionChanged += animClipsMenu.CloseDropDown;
+            animatorsMenu.onOpeningDropDown += animClipsMenu.CloseDropDown;
+            animClipsMenu.onOpeningDropDown += animatorsMenu.CloseDropDown;
         }
 
         // Find all animators in the scene

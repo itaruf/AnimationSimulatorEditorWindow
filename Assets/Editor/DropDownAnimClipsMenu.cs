@@ -17,6 +17,8 @@ public class DropDownAnimClipsMenu : DropDownMenu
         if (!animator.runtimeAnimatorController)
             return;
 
+        onOpeningDropDown?.Invoke();
+
         BeginWindows();
         rect = GUILayout.Window(123, rect, PopulateDropDown, "");
 
