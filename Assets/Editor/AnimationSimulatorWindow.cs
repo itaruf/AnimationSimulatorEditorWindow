@@ -85,20 +85,6 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animatorsMenu)
             return;
 
-        if (animatorsMenu.animators != null)
-        {
-            for (int i = 0; i < animatorsMenu.animators.Length; ++i)
-            {
-                if (animatorsMenu.animators[i] == null)
-                {
-                    UnityEngine.Debug.Log(true);
-                    animatorsMenu.label = "Select an animator";
-                    animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
-                }
-            }
-            /*UnityEngine.Debug.Log(animatorsMenu.animators.Length);*/
-        }
-
         animatorsMenu.animators = GetAnimatorsInScene();
     }
 
@@ -175,9 +161,7 @@ public class AnimationSimulatorWindow : EditorWindow
                     animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
                 }
             }
-            /*UnityEngine.Debug.Log(animatorsMenu.animators.Length);*/
         }
-
 
         for (int i = 0; i < animatorEditors.Count; ++i)
         {
@@ -201,7 +185,6 @@ public class AnimationSimulatorWindow : EditorWindow
 
         if (animatorEdit)
         {
-            animatorEdit.PrintAnimClipData();
             animatorEdit.PrintAnimClipData();
             animatorEdit.PlayClipBtn();
             animatorEdit.StopClipBtn();

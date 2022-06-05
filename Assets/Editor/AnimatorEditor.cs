@@ -108,6 +108,17 @@ public class AnimatorEditor : EditorWindow
     {
         if (!animationClip)
             return;
+        
+        
+        if (!animator.runtimeAnimatorController)
+        {
+            timeElapsed = 0;
+            EditorApplication.update -= PlayAnimationClip;
+            isPlaying = false;
+            stopwatch.Reset();
+            stopwatch.Stop();
+            return;
+        }
 
         GUIStyle buttonStyle;
         GUI.backgroundColor = new Color(1, 1, 1);
@@ -131,10 +142,22 @@ public class AnimatorEditor : EditorWindow
     public void PlayAnimationClip()
     {
         if (!animator)
+        {
+            Reset();
             return;
+        }
 
         if (!animationClip)
+        {
+            Reset();
             return;
+        }
+
+        if (!animator.runtimeAnimatorController)
+        {
+            Reset();
+            return;
+        }
 
         // The animation is now playing
         if (!isPlaying && !isPaused)
@@ -170,10 +193,22 @@ public class AnimatorEditor : EditorWindow
     public  void RestartAnimationClip()
     {
         if (!animator)
+        {
+            Reset();
             return;
+        }
 
         if (!animationClip)
+        {
+            Reset();
             return;
+        }
+
+        if (!animator.runtimeAnimatorController)
+        {
+            Reset();
+            return;
+        }
 
         // The animation is now playing
         if (!isPlaying)
@@ -234,6 +269,17 @@ public class AnimatorEditor : EditorWindow
         EditorGUILayout.LabelField($"Is animation set as looping : {animationClip.isLooping}", EditorStyles.label);
 
         EditorGUILayout.Space();
+    }
+
+    public void Reset()
+    {
+        timeElapsed = 0;
+        EditorApplication.update -= PlayAnimationClip;
+        EditorApplication.update -= RestartAnimationClip;
+        isPlaying = false;
+        stopwatch.Reset();
+        stopwatch.Stop();
+        return;
     }
 }
 
