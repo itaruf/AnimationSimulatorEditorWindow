@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using System;
 using UnityEditor.SceneManagement;
 using System.Diagnostics;
+using System.Linq;
 
 #if UNITY_EDITOR
 [ExecuteInEditMode]
@@ -74,13 +75,14 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void OnEnable()
     {
-    
+
     }
 
     void Update()
     {
         Repaint();
-        GetAnimatorsInScene();
+        if (animatorsMenu)
+             animatorsMenu.animators = GetAnimatorsInScene();
     }
 
     void OnGUI()
@@ -114,7 +116,28 @@ public class AnimationSimulatorWindow : EditorWindow
         }
 
         // Find all animators in the scene
-        animatorsMenu.animators = GetAnimatorsInScene();
+        /*animatorsMenu.animators = GetAnimatorsInScene();*/
+
+        if (animatorsMenu.animators != null)
+        {
+            for (int i = 0; i < animatorsMenu.animators.Length; ++i)
+            {
+                if (animatorsMenu.animators[i] == null)
+                {
+                    UnityEngine.Debug.Log(true);
+                    animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
+                }
+            }
+            UnityEngine.Debug.Log(animatorsMenu.animators.Length);
+        }
+
+        // Find all animators in the scene
+        /*animatorsMenu.animators = GetAnimatorsInScene();*/
+
+
+
+        /*UnityEngine.Debug.Log(animatorsMenu.animators.Length);*/
+
 
         /*********Drawings*********/
 
@@ -183,6 +206,11 @@ public class AnimationSimulatorWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
+    public T[] RemoveAt<T>(T[] arr, int index)
+    {
+        return arr.Where((e, i) => i != index).ToArray();
+    }
+
     static void SetFocusBackToGameObject()
     {
         if (Event.current.type == EventType.MouseDown)
@@ -194,7 +222,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
 
     // Get all animators from gameobjects in the scene
-    Animator[] GetAnimatorsInScene()
+    static Animator[] GetAnimatorsInScene()
     {
         Scene scene = SceneManager.GetActiveScene();
 
@@ -243,6 +271,8 @@ public class AnimationSimulatorWindow : EditorWindow
     static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
         UnityEngine.Debug.Log("SceneOpened");
+        // Find all animators in the scene
+        animatorsMenu.animators = GetAnimatorsInScene();
         Selection.activeGameObject = null;
         animatorEditors.Clear();
     }
