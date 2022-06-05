@@ -103,6 +103,31 @@ public class AnimatorEditor : EditorWindow
         }
     }
 
+    // Restart Button to restart the current animation clip
+    public void RestartClipBtn()
+    {
+        if (!animationClip)
+            return;
+
+        GUIStyle buttonStyle;
+        GUI.backgroundColor = new Color(1, 1, 1);
+        buttonStyle = new GUIStyle(GUI.skin.button);
+        bool btn = GUILayout.Button("Restart", buttonStyle);
+
+        if (btn)
+        {
+            EditorApplication.update -= RestartAnimationClip;
+            EditorApplication.update -= PlayAnimationClip;
+            EditorApplication.update += RestartAnimationClip;
+
+            sliderAnimTimestamp = 0;
+            isPaused = false;
+            stopwatch.Restart();
+
+            RestartAnimationClip();
+        }
+    }
+
     public void PlayAnimationClip()
     {
         if (!animator)
@@ -139,28 +164,6 @@ public class AnimatorEditor : EditorWindow
                 stopwatch.Reset();
                 stopwatch.Stop();
             }
-        }
-    }
-
-    /*RESTART*/
-
-    // Restart Button to restart the current animation clip
-    public void RestartClipBtn()
-    {
-        if (!animationClip)
-            return;
-
-        if (GUILayout.Button("Restart"))
-        {
-            EditorApplication.update -= RestartAnimationClip;
-            EditorApplication.update -= PlayAnimationClip;
-            EditorApplication.update += RestartAnimationClip;
-
-            sliderAnimTimestamp = 0;
-            isPaused = false;
-            stopwatch.Restart();
-
-            RestartAnimationClip();
         }
     }
 
