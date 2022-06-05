@@ -66,11 +66,9 @@ public class AnimationSimulatorWindow : EditorWindow
             return;
 
         if (gameObject.GetInstanceID() == animatorsMenu.animator.gameObject.GetInstanceID())
-        {
             EditorGUIUtility.PingObject(gameObject);
-        }
-
     }
+
     [MenuItem("Window/Animator Simulator")]
     private static void ShowWindow()
     {
@@ -244,7 +242,24 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animationClip)
             return;
 
-        if (GUILayout.Button("Play"))
+        bool btn = false;
+        GUIStyle buttonStyle;
+
+        if (!isPlaying)
+        {
+            GUI.backgroundColor = new Color(1, 1, 1);
+            buttonStyle = new GUIStyle(GUI.skin.button);
+            btn = GUILayout.Button("Play", buttonStyle);
+        }
+
+        else
+        {
+            GUI.backgroundColor = Color.red;
+            buttonStyle = new GUIStyle(GUI.skin.button);
+            btn = GUILayout.Button("Play", buttonStyle);
+        }
+
+        if (btn)
         {
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update -= RestartAnimationClip;
@@ -262,7 +277,24 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animationClip)
             return;
 
-        if (GUILayout.Button("Stop"))
+        bool btn = false;
+        GUIStyle buttonStyle;
+
+        if (!isPaused)
+        {
+            GUI.backgroundColor = new Color(1, 1, 1);
+            buttonStyle = new GUIStyle(GUI.skin.button);
+            btn = GUILayout.Button("Stop", buttonStyle);
+        }
+
+        else
+        {
+            GUI.backgroundColor = Color.yellow;
+            buttonStyle = new GUIStyle(GUI.skin.button);
+            btn = GUILayout.Button("Stop", buttonStyle);
+        }
+
+        if (btn)
         {
             if (!isPlaying)
                 return;
@@ -272,6 +304,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
             EditorApplication.update -= RestartAnimationClip;
             isPaused = true;
+            isPlaying = false;
         }
     }
 
@@ -351,9 +384,12 @@ public class AnimationSimulatorWindow : EditorWindow
 
     public void Reset()
     {
+        EditorApplication.update -= PlayAnimationClip;
         sliderAnimSpeed = 1;
         sliderAnimTimestamp = 0;
         stopwatch.Reset();
+        isPlaying = false;
+        isPaused = false;
     }
 
     // Get all animators from gameobjects in the scene
@@ -377,6 +413,9 @@ public class AnimationSimulatorWindow : EditorWindow
     static void OnSceneClosing()
     {
         isPlaying = false;
+        isPaused = false;
+        sliderAnimSpeed = 1;
+        sliderAnimTimestamp = 0;
         Selection.activeGameObject = null;
         animatorsMenu.Reset();
         animClipsMenu.Reset();

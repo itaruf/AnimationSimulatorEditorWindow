@@ -57,7 +57,14 @@ public class DropDownAnimatorsMenu : DropDownMenu
             if (!a.name.ToUpper().Contains(strResult.ToUpper()) && searchField.HasFocus())
                 continue;
 
-            if (GUILayout.Button(a.name))
+            /*Color oldColor = GUI.backgroundColor;
+            GUI.backgroundColor = Color.clear;*/
+
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+
+            bool btn = GUILayout.Button(a.name, buttonStyle);
+
+            if (btn)                 
             {
                 CloseDropDown();
 
