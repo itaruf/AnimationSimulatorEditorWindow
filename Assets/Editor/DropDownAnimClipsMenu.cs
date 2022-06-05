@@ -9,8 +9,9 @@ public class DropDownAnimClipsMenu : DropDownMenu
     DropDownAnimClipsMenu()
     {
         label = "Select an animation";
+        rect = new Rect(0, 75, 200, 200);
     }
-  
+
     public override void DrawDropDown()
     {
         if (!animator.runtimeAnimatorController)
@@ -18,7 +19,6 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
         BeginWindows();
         rect = GUILayout.Window(123, rect, PopulateDropDown, "");
-        SearchField();
 
         if (Event.current.type == EventType.MouseDown)
         {
@@ -38,10 +38,9 @@ public class DropDownAnimClipsMenu : DropDownMenu
             return;
 
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
-        {
             showDropDown = !showDropDown;
-            /*Selection.activeObject = animator.gameObject;*/
-        }
+
+        SearchField();
     }
 
     public override void PopulateDropDown(int unusedWindowID)

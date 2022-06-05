@@ -12,13 +12,13 @@ public class DropDownAnimatorsMenu : DropDownMenu
     DropDownAnimatorsMenu()
     {
         label = "Select an animator";
+        rect = new Rect(0, 55, 200, 200);
     }
 
     public override void DrawDropDown()
     {
         BeginWindows();
         rect = GUILayout.Window(200, rect, PopulateDropDown, "");
-        SearchField();
 
         if (Event.current.type == EventType.MouseDown)
         {
@@ -38,6 +38,8 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
                 showDropDown = !showDropDown;
+        SearchField();
+
     }
 
     public override void PopulateDropDown(int unusedWindowID)
