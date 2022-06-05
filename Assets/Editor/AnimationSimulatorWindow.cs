@@ -21,15 +21,15 @@ public class AnimationSimulatorWindow : EditorWindow
 
     // Menus
     static DropDownAnimatorsMenu animatorsMenu;
-    static DropDownAnimClipsMenu animClipsMenu;
-    AnimatorEditor animatorEdit;
+    static DropDownAnimClipsMenu animClipsMenu; 
     List<DropDownMenu> dropdownMenus = new List<DropDownMenu>();
 
-    public static Stopwatch stopwatch = new Stopwatch();
+    // Animator Editor Data
+    AnimatorEditor animatorEdit;
+    static List<AnimatorEditor> animatorEditors = new List<AnimatorEditor>();
+
 
     static EditorApplication.HierarchyWindowItemCallback hierarchyItemCallback;
-
-    static List<AnimatorEditor> animatorEditors = new List<AnimatorEditor>();
 
     // Subscribing to events
     static AnimationSimulatorWindow()
@@ -46,6 +46,7 @@ public class AnimationSimulatorWindow : EditorWindow
         /*EditorApplication.update += OnEditorUpdate;*/
     }
 
+    // Highlight the last current gameobject with an animator 
     static void Highlight(int instanceID, Rect selectionRect)
     {
         GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
@@ -85,11 +86,13 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animatorsMenu)
             return;
 
+        // Get all the animators in the scene
         animatorsMenu.animators = GetAnimatorsInScene();
     }
 
     void OnGUI()
     {
+        // Stopping the application when playing
         if (Application.isPlaying)
             Close();
 
@@ -134,9 +137,12 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
+        // Drawing drop down buttons (animation one only if there's an animator selected
         animatorsMenu.DropDownButton();
         animClipsMenu.animator = animatorsMenu.animator;
         animClipsMenu.DropDownButton();
+
+        /*Skips*/
 
         if (animClipsMenu.showDropDown || animatorsMenu.showDropDown)
             goto exit;
@@ -150,6 +156,7 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animator.runtimeAnimatorController)
             goto exit;
 
+        //Deleting the references without animators
         if (animatorsMenu.animators != null)
         {
             for (int i = 0; i < animatorsMenu.animators.Length; ++i)
@@ -163,6 +170,7 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
+        // Deleting the references without animators*/
         for (int i = 0; i < animatorEditors.Count; ++i)
         {
             if (animatorEditors[i].animator == null)
@@ -170,6 +178,7 @@ public class AnimationSimulatorWindow : EditorWindow
                 animatorEditors.RemoveAt(i);
                 i--;
             }
+            // Selecting the current selected gameobject with animator in the scene*/
             else 
             {
                 if (animatorEditors[i].animator.gameObject.GetInstanceID() == Selection.activeInstanceID)
@@ -183,6 +192,7 @@ public class AnimationSimulatorWindow : EditorWindow
             }
         }
 
+        // Printing its animation data
         if (animatorEdit)
         {
             animatorEdit.PrintAnimClipData();
@@ -191,6 +201,7 @@ public class AnimationSimulatorWindow : EditorWindow
             animatorEdit.RestartClipBtn();
         }
 
+        // We are currently selecting an item in one of the drop downs
         exit:
         if (animatorsMenu.showDropDown)
             animatorsMenu.DrawDropDown();
@@ -205,11 +216,13 @@ public class AnimationSimulatorWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
+    // Removing an item from a container
     public T[] RemoveAt<T>(T[] arr, int index)
     {
         return arr.Where((e, i) => i != index).ToArray();
     }
 
+    // Focusing back a gameobject
     static void SetFocusBackToGameObject()
     {
         if (Event.current.type == EventType.MouseDown)
@@ -220,7 +233,7 @@ public class AnimationSimulatorWindow : EditorWindow
     }
 
 
-    // Get all animators from gameobjects in the scene
+    // Get all animators from all the gameobjects in the scene
     static Animator[] GetAnimatorsInScene()
     {
         Scene scene = SceneManager.GetActiveScene();
@@ -235,6 +248,7 @@ public class AnimationSimulatorWindow : EditorWindow
             AnimatorList.AddRange(rootGameObject.GetComponentsInChildren<Animator>(true));
         }
 
+        // Filling the animator editors at the same time
         foreach (var a in AnimatorList)
         {
             bool exist = false;
