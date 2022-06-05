@@ -34,6 +34,9 @@ public class AnimationSimulatorWindow : EditorWindow
 
     public Stopwatch stopwatch = new Stopwatch();
 
+    static EditorApplication.HierarchyWindowItemCallback hierarchyItemCallback;
+
+
     // Subscribing to events
     static AnimationSimulatorWindow()
     {
@@ -41,9 +44,35 @@ public class AnimationSimulatorWindow : EditorWindow
         EditorSceneManager.sceneOpening += SceneOpening;
         EditorSceneManager.sceneOpened += SceneOpened;
         EditorApplication.playModeStateChanged += LogPlayModeState;
+
+        hierarchyItemCallback = new EditorApplication.HierarchyWindowItemCallback(Highlight);
+
+        EditorApplication.hierarchyWindowItemOnGUI = (EditorApplication.HierarchyWindowItemCallback)Delegate.Combine(EditorApplication.hierarchyWindowItemOnGUI, hierarchyItemCallback);
+
+        /*EditorApplication.update += OnEditorUpdate;*/
     }
 
     [MenuItem("Window/Animator Simulator")]
+
+    static void Highlight(int instanceID, Rect selectionRect)
+    {
+        GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+
+        if (!gameObject)
+            return;
+
+        if (!animatorsMenu)
+            return;
+
+        if (!animatorsMenu.animator)
+            return;
+
+        if (gameObject.GetInstanceID() == animatorsMenu.animator.gameObject.GetInstanceID())
+        {
+            EditorGUIUtility.PingObject(gameObject);
+        }
+
+    }
     private static void ShowWindow()
     {
         if (Application.isPlaying)

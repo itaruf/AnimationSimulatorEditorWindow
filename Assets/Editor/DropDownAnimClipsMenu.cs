@@ -76,7 +76,6 @@ public class DropDownAnimClipsMenu : DropDownMenu
         }
 
         exit:
-
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
     }
