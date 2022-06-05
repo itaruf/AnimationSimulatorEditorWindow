@@ -52,8 +52,6 @@ public class AnimationSimulatorWindow : EditorWindow
         /*EditorApplication.update += OnEditorUpdate;*/
     }
 
-    [MenuItem("Window/Animator Simulator")]
-
     static void Highlight(int instanceID, Rect selectionRect)
     {
         GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
@@ -73,6 +71,7 @@ public class AnimationSimulatorWindow : EditorWindow
         }
 
     }
+    [MenuItem("Window/Animator Simulator")]
     private static void ShowWindow()
     {
         if (Application.isPlaying)
@@ -131,7 +130,7 @@ public class AnimationSimulatorWindow : EditorWindow
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, false);
 
-        GUILayout.Label($"Animators in the scene : {animatorsMenu.animators.Length}", EditorStyles.boldLabel);
+        /*EditorGUILayout.LabelField($"Animators in the scene : {animatorsMenu.animators.Length}", EditorStyles.boldLabel);*/
 
         if (Selection.activeGameObject)
         {
@@ -159,14 +158,7 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animator.runtimeAnimatorController)
             goto exit;
 
-        GUILayout.Label($"[Preview] Current Animation Speed", EditorStyles.boldLabel);
-        sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
-
-        GUILayout.Label($"[Preview] Animation Starting Timestamp", EditorStyles.boldLabel);
-        sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
         PrintAnimClipData();
-
-        animLoopBtn = EditorGUILayout.Toggle("[Preview] Loop Animation", animLoopBtn);
 
         RestartClipBtn();
         PlayClipBtn();
@@ -204,10 +196,28 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animator.runtimeAnimatorController)
             return;
 
-        GUILayout.Label($"Current Animation Data", EditorStyles.boldLabel);
-        GUILayout.Label($"Animation total length : {Math.Round(animClipsMenu.animationClip.length, 2)}", EditorStyles.label);
-        GUILayout.Label($"Current Animation timestamp : {Math.Round(timeElapsed, 2)}", EditorStyles.label);
-        GUILayout.Label($"Is animation set as Looping: {animClipsMenu.animationClip.isLooping}", EditorStyles.label);
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField($"[Preview]", EditorStyles.boldLabel);
+
+        EditorGUILayout.LabelField($"Animation Speed", EditorStyles.label);
+        sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
+
+        EditorGUILayout.LabelField($"Animation Starting Timestamp", EditorStyles.label);
+        sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
+
+        EditorGUILayout.LabelField($"Animation timestamp : {Math.Round(timeElapsed, 2)}", EditorStyles.label);
+
+        animLoopBtn = EditorGUILayout.Toggle("Loop Animation", animLoopBtn);
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField($"[Animation Data]", EditorStyles.boldLabel);
+
+        EditorGUILayout.LabelField($"Animation total length : {Math.Round(animClipsMenu.animationClip.length, 2)}", EditorStyles.label);
+        EditorGUILayout.LabelField($"Is animation set as looping : {animClipsMenu.animationClip.isLooping}", EditorStyles.label);
+
+        EditorGUILayout.Space();
     }
 
     // Restart Button to restart the current animation clip
