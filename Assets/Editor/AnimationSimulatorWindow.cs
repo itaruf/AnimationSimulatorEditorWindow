@@ -86,6 +86,19 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animatorsMenu)
             return;
 
+        //Deleting the references without animators
+        if (animatorsMenu.animators != null)
+        {
+            for (int i = 0; i < animatorsMenu.animators.Length; ++i)
+            {
+                if (animatorsMenu.animators[i] == null)
+                {
+                    animatorsMenu.label = "Select an animator";
+                    animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
+                }
+            }
+        }
+
         // Get all the animators in the scene
         animatorsMenu.animators = GetAnimatorsInScene();
     }
