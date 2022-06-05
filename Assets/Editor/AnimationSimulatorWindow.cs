@@ -329,6 +329,8 @@ public class AnimationSimulatorWindow : EditorWindow
     {
         isPlaying = false;
         Selection.activeGameObject = null;
+        animatorsMenu.Reset();
+        animClipsMenu.Reset();
         /*EditorApplication.update -= PlayAnimationClip;*/
     }
 
@@ -336,8 +338,6 @@ public class AnimationSimulatorWindow : EditorWindow
     {
         UnityEngine.Debug.Log("SceneOpened");
         Selection.activeGameObject = null;
-        /*animatorsMenu = null;*/
-        animClipsMenu = null;
         animatorsMenu.animators = GetAnimatorsInScene();
     }
 
