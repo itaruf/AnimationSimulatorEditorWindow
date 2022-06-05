@@ -80,9 +80,11 @@ public class DropDownAnimClipsMenu : DropDownMenu
     {
         if (animationClip && animator)
         {
-            animationClip.SampleAnimation(animator.gameObject, 0);
             if (animator.runtimeAnimatorController)
+            {
                 animationClip = animator.runtimeAnimatorController.animationClips[0];
+                animationClip.SampleAnimation(animator.gameObject, 0);
+            }
         }
 
         if (Selection.activeGameObject)
