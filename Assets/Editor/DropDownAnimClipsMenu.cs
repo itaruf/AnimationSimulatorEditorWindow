@@ -82,14 +82,14 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
     public override void Reset()
     {
-        if (animationClip && animator)
+        /*if (animationClip && animator)
         {
             if (animator.runtimeAnimatorController)
             {
                 animationClip = animator.runtimeAnimatorController.animationClips[0];
                 animationClip.SampleAnimation(animator.gameObject, 0);
             }
-        }
+        }*/
 
         if (Selection.activeGameObject)
         {
@@ -101,6 +101,7 @@ public class DropDownAnimClipsMenu : DropDownMenu
                     label = "Select an animation";
                     return;
                 }
+
                 animationClip = animator.runtimeAnimatorController.animationClips[0];
                 label = animationClip.name;
                 Selection.activeGameObject = animator.gameObject;

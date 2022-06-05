@@ -163,7 +163,6 @@ public class AnimationSimulatorWindow : EditorWindow
             {
                 if (animatorsMenu.animators[i] == null)
                 {
-                    UnityEngine.Debug.Log(true);
                     animatorsMenu.label = "Select an animator";
                     animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
                 }
@@ -284,7 +283,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void SceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
-        UnityEngine.Debug.Log("SceneOpened");
+        /*UnityEngine.Debug.Log("SceneOpened");*/
 
         // Find all animators in the scene
         if (!animatorsMenu)
@@ -298,12 +297,12 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
     {
-        UnityEngine.Debug.Log("SceneOpening");
+        /*UnityEngine.Debug.Log("SceneOpening");*/
     }
    
     static void SceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingScene)
     {
-        UnityEngine.Debug.Log("SceneClosing");
+        /*UnityEngine.Debug.Log("SceneClosing");*/
         OnSceneClosing();
     }
 

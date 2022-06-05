@@ -32,6 +32,7 @@ public abstract class DropDownMenu : EditorWindow
 
     public abstract void Reset();
 
+    // Search bar
     public virtual void SearchField()
     {
         if (!showDropDown)
@@ -46,6 +47,7 @@ public abstract class DropDownMenu : EditorWindow
         GUILayout.EndHorizontal();
     }
 
+    // Closing a dropdown and reseting some values
     public void CloseDropDown()
     {
         if (showDropDown)
