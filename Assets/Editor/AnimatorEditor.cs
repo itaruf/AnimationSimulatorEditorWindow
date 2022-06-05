@@ -214,25 +214,26 @@ public class AnimatorEditor : EditorWindow
         if (!isPlaying)
             isPlaying = true;
 
-        if (!isPaused)
+        if (isPaused)
+            return;
+
+
+        // Restart at the beginning of the animation clip
+        timeElapsed = sliderAnimSpeed * stopwatch.Elapsed.TotalSeconds;
+        animationClip.SampleAnimation(animator.gameObject, (float)timeElapsed);
+
+        // Loop animation - Restarting chrono
+        if (timeElapsed >= animationClip.length && animLoopBtn)
+            stopwatch.Restart();
+
+        // Stoping the animation from playing 
+        if (timeElapsed >= animationClip.length && !animLoopBtn)
         {
-            // Restart at the beginning of the animation clip
-            timeElapsed = sliderAnimSpeed * stopwatch.Elapsed.TotalSeconds;
-            animationClip.SampleAnimation(animator.gameObject, (float)timeElapsed);
-
-            // Loop animation - Restarting chrono
-            if (timeElapsed >= animationClip.length && animLoopBtn)
-                stopwatch.Restart();
-
-            // Stoping the animation from playing 
-            if (timeElapsed >= animationClip.length && !animLoopBtn)
-            {
-                timeElapsed = 0;
-                EditorApplication.update -= RestartAnimationClip;
-                isPlaying = false;
-                stopwatch.Reset();
-                stopwatch.Stop();
-            }
+            timeElapsed = 0;
+            EditorApplication.update -= RestartAnimationClip;
+            isPlaying = false;
+            stopwatch.Reset();
+            stopwatch.Stop();
         }
     }
 
