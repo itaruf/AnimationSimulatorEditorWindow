@@ -55,7 +55,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     private void OnEnable()
     {
-        /*Selection.selectionChanged += Reset;*/
+        Selection.selectionChanged += Reset;
     }
 
     private void Update()
