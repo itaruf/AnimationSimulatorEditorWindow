@@ -37,7 +37,7 @@ public class AnimatorEditor : EditorWindow
         if (!animationClip)
             return;
 
-       /* bool btn = false;
+        bool btn = false;
         GUIStyle buttonStyle;
 
         if (!isPlaying)
@@ -52,9 +52,9 @@ public class AnimatorEditor : EditorWindow
             GUI.backgroundColor = Color.red;
             buttonStyle = new GUIStyle(GUI.skin.button);
             btn = GUILayout.Button("Play", buttonStyle);
-        }*/
+        }
 
-        if (GUILayout.Button("Play"))
+        if (btn)
         {
             EditorApplication.update -= PlayAnimationClip;
             EditorApplication.update -= RestartAnimationClip;
@@ -72,7 +72,7 @@ public class AnimatorEditor : EditorWindow
         if (!animationClip)
             return;
 
-        /*bool btn = false;
+        bool btn = false;
         GUIStyle buttonStyle;
 
         if (!isPaused)
@@ -87,9 +87,9 @@ public class AnimatorEditor : EditorWindow
             GUI.backgroundColor = Color.yellow;
             buttonStyle = new GUIStyle(GUI.skin.button);
             btn = GUILayout.Button("Stop", buttonStyle);
-        }*/
+        }
 
-        if (GUILayout.Button("Stop"))
+        if (btn)
         {
             if (!isPlaying)
                 return;
@@ -232,16 +232,5 @@ public class AnimatorEditor : EditorWindow
 
         EditorGUILayout.Space();
     }
-
-/*    public static void OnClosing()
-    {
-        EditorApplication.update -= RestartAnimationClip;
-        EditorApplication.update -= PlayAnimationClip; 
-        sliderAnimSpeed = 1;
-        sliderAnimTimestamp = 0;
-        stopwatch.Reset();
-        isPlaying = false;
-        isPaused = false;
-    }*/
 }
 

@@ -74,7 +74,7 @@ public class AnimationSimulatorWindow : EditorWindow
 
     void OnEnable()
     {
-        Selection.selectionChanged += Reset;
+    
     }
 
     void Update()
@@ -193,27 +193,6 @@ public class AnimationSimulatorWindow : EditorWindow
     }
 
 
-   
-    static void Reset()
-    {
-       /* bool result = false;
-        if (Selection.activeGameObject)
-            result = Selection.activeGameObject.TryGetComponent(out animator);
-        else
-            return;
-
-        if (result && !animator.runtimeAnimatorController)
-        {
-            *//*EditorApplication.update -= RestartAnimationClip;
-            EditorApplication.update -= PlayAnimationClip;*/
-            /*sliderAnimSpeed = 1;
-            sliderAnimTimestamp = 0;
-            stopwatch.Reset();
-            isPlaying = false;
-            isPaused = false;*//*
-        }*/
-    }
-
     // Get all animators from gameobjects in the scene
     Animator[] GetAnimatorsInScene()
     {
@@ -256,13 +235,6 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void OnSceneClosing()
     {
-        /*EditorApplication.update -= RestartAnimationClip;
-        EditorApplication.update -= PlayAnimationClip;*/
-      /*  sliderAnimSpeed = 1;
-        sliderAnimTimestamp = 0;
-        stopwatch.Reset();
-        isPlaying = false;
-        isPaused = false;*/
         Selection.activeGameObject = null;
         animatorsMenu.Reset();
         animClipsMenu.Reset();
