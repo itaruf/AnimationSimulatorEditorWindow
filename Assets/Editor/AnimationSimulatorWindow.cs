@@ -68,7 +68,7 @@ public class AnimationSimulatorWindow : EditorWindow
         if (Application.isPlaying)
             this.Close();
 
-        /*Instanciation des dropdown menus*/
+        /*********DropDown Menus instanciation*********/
         if (!animatorsMenu)
         {
             animatorsMenu = CreateInstance<DropDownAnimatorsMenu>();
@@ -85,7 +85,6 @@ public class AnimationSimulatorWindow : EditorWindow
 
             if (!dropdownMenus.Contains(animClipsMenu))
                 dropdownMenus.Add(animClipsMenu);
-            /*animatorsMenu.onAnimatorChange += animClipsMenu.Reset;*/
 
             Selection.selectionChanged += animClipsMenu.Reset;
             Selection.selectionChanged += animClipsMenu.CloseDropDown;
@@ -97,20 +96,18 @@ public class AnimationSimulatorWindow : EditorWindow
         // Find all animators in the scene
         animatorsMenu.animators = GetAnimatorsInScene();
 
-        /*Drawings*/
+        /*********Drawings*********/
 
         // Scrollbar
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, false);
 
-        GUILayout.Label($"Animators : {animatorsMenu.animators.Length}", EditorStyles.boldLabel);
+        GUILayout.Label($"Animators in the scene : {animatorsMenu.animators.Length}", EditorStyles.boldLabel);
 
         if (Selection.activeGameObject)
         {
             if (Selection.activeGameObject.GetComponent<Animator>())
             {
-                /* if (Selection.activeGameObject.TryGetComponent(out animatorsMenu.animator))
-                 {*/
                 animatorsMenu.animator = Selection.activeGameObject.GetComponent<Animator>();
                 animatorsMenu.label = animatorsMenu.animator.gameObject.name + " " + animatorsMenu.animator.gameObject.GetInstanceID().ToString();
                 Selection.activeGameObject = animatorsMenu.animator.gameObject;
@@ -118,7 +115,6 @@ public class AnimationSimulatorWindow : EditorWindow
         }
 
         animatorsMenu.DropDownButton();
-
         animClipsMenu.animator = animatorsMenu.animator;
         animClipsMenu.DropDownButton();
 

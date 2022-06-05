@@ -46,9 +46,12 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
     public override void PopulateDropDown(int unusedWindowID)
     {
+        if (animators.Length <= 0)
+            goto exit;
+
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, true);
-
+        
         foreach (var a in animators)
         {
             if (!a.name.ToUpper().Contains(strResult.ToUpper()) && searchField.HasFocus())
@@ -59,7 +62,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
                 CloseDropDown();
 
                 if (animator == a)
-                    return;
+                    goto exit;
 
                 Selection.activeObject = a.gameObject;
                 animator = a;
@@ -69,6 +72,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
             }
         }
 
+        exit:
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
     }

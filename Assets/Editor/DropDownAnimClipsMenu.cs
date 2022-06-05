@@ -28,6 +28,9 @@ public class DropDownAnimClipsMenu : DropDownMenu
 
     public override void DrawDropDown()
     {
+        if (!animator)
+            return;
+
         if (!animator.runtimeAnimatorController)
             return;
 
@@ -48,10 +51,10 @@ public class DropDownAnimClipsMenu : DropDownMenu
     public override void PopulateDropDown(int unusedWindowID)
     {
         if (!animator)
-            return;
+            goto exit;
 
         if (!animator.runtimeAnimatorController)
-            return;
+            goto exit;
 
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, true);
@@ -71,6 +74,8 @@ public class DropDownAnimClipsMenu : DropDownMenu
                 animationClip = a;
             }
         }
+
+        exit:
 
         EditorGUILayout.EndScrollView();
         EditorGUILayout.EndVertical();
