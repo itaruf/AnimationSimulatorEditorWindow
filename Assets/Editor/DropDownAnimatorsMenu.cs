@@ -26,7 +26,6 @@ public class DropDownAnimatorsMenu : DropDownMenu
         if (EditorGUILayout.DropdownButton(new GUIContent(label), FocusType.Passive))
                 showDropDown = !showDropDown;
         SearchField();
-
     }
 
     public override void DrawDropDown()
@@ -51,7 +50,7 @@ public class DropDownAnimatorsMenu : DropDownMenu
 
         EditorGUILayout.BeginVertical();
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos, false, true);
-        
+
         foreach (var a in animators)
         {
             if (!a.name.ToUpper().Contains(strResult.ToUpper()) && searchField.HasFocus())

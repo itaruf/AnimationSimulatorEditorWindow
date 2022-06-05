@@ -81,8 +81,25 @@ public class AnimationSimulatorWindow : EditorWindow
     void Update()
     {
         Repaint();
-        if (animatorsMenu)
-             animatorsMenu.animators = GetAnimatorsInScene();
+
+        if (!animatorsMenu)
+            return;
+
+        if (animatorsMenu.animators != null)
+        {
+            for (int i = 0; i < animatorsMenu.animators.Length; ++i)
+            {
+                if (animatorsMenu.animators[i] == null)
+                {
+                    UnityEngine.Debug.Log(true);
+                    animatorsMenu.label = "Select an animator";
+                    animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
+                }
+            }
+            /*UnityEngine.Debug.Log(animatorsMenu.animators.Length);*/
+        }
+
+        animatorsMenu.animators = GetAnimatorsInScene();
     }
 
     void OnGUI()
@@ -114,30 +131,6 @@ public class AnimationSimulatorWindow : EditorWindow
             animatorsMenu.onOpeningDropDown += animClipsMenu.CloseDropDown;
             animClipsMenu.onOpeningDropDown += animatorsMenu.CloseDropDown;
         }
-
-        // Find all animators in the scene
-        /*animatorsMenu.animators = GetAnimatorsInScene();*/
-
-        if (animatorsMenu.animators != null)
-        {
-            for (int i = 0; i < animatorsMenu.animators.Length; ++i)
-            {
-                if (animatorsMenu.animators[i] == null)
-                {
-                    UnityEngine.Debug.Log(true);
-                    animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
-                }
-            }
-            UnityEngine.Debug.Log(animatorsMenu.animators.Length);
-        }
-
-        // Find all animators in the scene
-        /*animatorsMenu.animators = GetAnimatorsInScene();*/
-
-
-
-        /*UnityEngine.Debug.Log(animatorsMenu.animators.Length);*/
-
 
         /*********Drawings*********/
 
@@ -171,14 +164,37 @@ public class AnimationSimulatorWindow : EditorWindow
         if (!animClipsMenu.animator.runtimeAnimatorController)
             goto exit;
 
-        foreach (var a in animatorEditors)
+        if (animatorsMenu.animators != null)
         {
-            if (a.animator.gameObject.GetInstanceID() == Selection.activeInstanceID)
+            for (int i = 0; i < animatorsMenu.animators.Length; ++i)
             {
-                if (animatorsMenu.animator.gameObject.GetInstanceID() == a.animator.gameObject.GetInstanceID())
+                if (animatorsMenu.animators[i] == null)
                 {
-                    animatorEdit = a;
-                    a.animationClip = animClipsMenu.animationClip;
+                    UnityEngine.Debug.Log(true);
+                    animatorsMenu.label = "Select an animator";
+                    animatorsMenu.animators = RemoveAt(animatorsMenu.animators, i);
+                }
+            }
+            /*UnityEngine.Debug.Log(animatorsMenu.animators.Length);*/
+        }
+
+
+        for (int i = 0; i < animatorEditors.Count; ++i)
+        {
+            if (animatorEditors[i].animator == null)
+            {
+                animatorEditors.RemoveAt(i);
+                i--;
+            }
+            else 
+            {
+                if (animatorEditors[i].animator.gameObject.GetInstanceID() == Selection.activeInstanceID)
+                {
+                    if (animatorsMenu.animator.gameObject.GetInstanceID() == animatorEditors[i].animator.gameObject.GetInstanceID())
+                    {
+                        animatorEdit = animatorEditors[i];
+                        animatorEditors[i].animationClip = animClipsMenu.animationClip;
+                    }
                 }
             }
         }
