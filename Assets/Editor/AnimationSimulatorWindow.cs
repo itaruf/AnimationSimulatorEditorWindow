@@ -121,30 +121,33 @@ public class AnimationSimulatorWindow : EditorWindow
 
         animClipsMenu.animator = animatorsMenu.animator;
         animClipsMenu.DropDownButton();
-        
-        if (!animClipsMenu.showDropDown && !animatorsMenu.showDropDown)
-        {
-            // Get more data when there's an animation clip selected
-            if (animClipsMenu.animationClip)
-            {
-                if (animClipsMenu.animator.runtimeAnimatorController)
-                {
-                    GUILayout.Label($"[Preview] Current Animation Speed", EditorStyles.boldLabel);
-                    sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
 
-                    GUILayout.Label($"[Preview] Animation Starting Timestamp", EditorStyles.boldLabel);
-                    sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
-                    PrintAnimClipData();
+        if (animClipsMenu.showDropDown || animatorsMenu.showDropDown)
+            goto exit;
 
-                    animLoopBtn = EditorGUILayout.Toggle("[Preview] Loop Animation", animLoopBtn);
+        if (!animClipsMenu.animationClip)
+            goto exit;
 
-                    RestartClipBtn();
-                    PlayClipBtn();
-                    StopClipBtn();
-                }
-            }
-        }
+        if (!animClipsMenu.animator)
+            goto exit;
 
+        if (!animClipsMenu.animator.runtimeAnimatorController)
+            goto exit;
+
+        GUILayout.Label($"[Preview] Current Animation Speed", EditorStyles.boldLabel);
+        sliderAnimSpeed = EditorGUILayout.Slider(sliderAnimSpeed, 0, 2);
+
+        GUILayout.Label($"[Preview] Animation Starting Timestamp", EditorStyles.boldLabel);
+        sliderAnimTimestamp = EditorGUILayout.Slider(sliderAnimTimestamp, 0, animClipsMenu.animationClip.length);
+        PrintAnimClipData();
+
+        animLoopBtn = EditorGUILayout.Toggle("[Preview] Loop Animation", animLoopBtn);
+
+        RestartClipBtn();
+        PlayClipBtn();
+        StopClipBtn();
+
+        exit:
 
         if (animatorsMenu.showDropDown)
             animatorsMenu.DrawDropDown();
