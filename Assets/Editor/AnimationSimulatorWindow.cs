@@ -158,7 +158,7 @@ public class AnimationSimulatorWindow : EditorWindow
                     a.PrintAnimClipData();
                     a.PlayClipBtn();
                     a.StopClipBtn();
-                    a.RestartAnimationClip();
+                    a.RestartClipBtn();
                 }
             }
         }
@@ -210,7 +210,7 @@ public class AnimationSimulatorWindow : EditorWindow
     }
 
     // Get all animators from gameobjects in the scene
-    static Animator[] GetAnimatorsInScene()
+    Animator[] GetAnimatorsInScene()
     {
         Scene scene = SceneManager.GetActiveScene();
 
@@ -237,7 +237,11 @@ public class AnimationSimulatorWindow : EditorWindow
             }
 
             if (!exist)
-                animatorEditors.Add(new AnimatorEditor(a));
+            {
+                var aE = new AnimatorEditor(a);
+                animatorEditors.Add(aE);
+                /*EditorSceneManager.sceneClosing += aE.OnClosing;*/
+            }
         }
 
         /*UnityEngine.Debug.Log(animatorEditors.Count);*/
@@ -263,7 +267,7 @@ public class AnimationSimulatorWindow : EditorWindow
     {
         UnityEngine.Debug.Log("SceneOpened");
         Selection.activeGameObject = null;
-        animatorsMenu.animators = GetAnimatorsInScene();
+        animatorEditors.Clear();
     }
 
     static void SceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)

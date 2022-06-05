@@ -14,8 +14,8 @@ public class AnimatorEditor : EditorWindow
     public double timeElapsed = 0;
     public  Stopwatch stopwatch = new Stopwatch();
 
-    public  float sliderAnimSpeed = 1.0f;
-    public  float sliderAnimTimestamp = 1.0f;
+    public float sliderAnimSpeed = 1.0f;
+    public float sliderAnimTimestamp = 0f;
 
      bool animLoopBtn = true;
 
@@ -143,6 +143,27 @@ public class AnimatorEditor : EditorWindow
     }
 
     /*RESTART*/
+
+    // Restart Button to restart the current animation clip
+    public void RestartClipBtn()
+    {
+        if (!animationClip)
+            return;
+
+        if (GUILayout.Button("Restart"))
+        {
+            EditorApplication.update -= RestartAnimationClip;
+            EditorApplication.update -= PlayAnimationClip;
+            EditorApplication.update += RestartAnimationClip;
+
+            sliderAnimTimestamp = 0;
+            isPaused = false;
+            stopwatch.Restart();
+
+            RestartAnimationClip();
+        }
+    }
+
     public  void RestartAnimationClip()
     {
         if (!animator)
@@ -212,5 +233,16 @@ public class AnimatorEditor : EditorWindow
 
         EditorGUILayout.Space();
     }
+
+/*    public static void OnClosing()
+    {
+        EditorApplication.update -= RestartAnimationClip;
+        EditorApplication.update -= PlayAnimationClip; 
+        sliderAnimSpeed = 1;
+        sliderAnimTimestamp = 0;
+        stopwatch.Reset();
+        isPlaying = false;
+        isPaused = false;
+    }*/
 }
 
