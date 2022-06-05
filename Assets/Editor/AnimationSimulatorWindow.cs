@@ -13,7 +13,7 @@ public class AnimationSimulatorWindow : EditorWindow
     static AnimationSimulatorWindow window;
 
     // Animation Data
-    public Animator animator = new Animator();
+    public static Animator animator = new Animator();
     static bool isPlaying = false;
     static bool isPaused = false;
     static double timeElapsed;
@@ -384,13 +384,17 @@ public class AnimationSimulatorWindow : EditorWindow
 
     static void Reset()
     {
-        EditorApplication.update -= RestartAnimationClip;
-        EditorApplication.update -= PlayAnimationClip;
-        sliderAnimSpeed = 1;
-        sliderAnimTimestamp = 0;
-        stopwatch.Reset();
-        isPlaying = false;
-        isPaused = false;
+        bool result = Selection.activeGameObject.TryGetComponent(out animator);
+        if (!result || (result && !animator.runtimeAnimatorController))
+        {
+            EditorApplication.update -= RestartAnimationClip;
+            EditorApplication.update -= PlayAnimationClip;
+            sliderAnimSpeed = 1;
+            sliderAnimTimestamp = 0;
+            stopwatch.Reset();
+            isPlaying = false;
+            isPaused = false;
+        }
     }
 
     // Get all animators from gameobjects in the scene
